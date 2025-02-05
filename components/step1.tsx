@@ -1,8 +1,10 @@
+"use client";
 import type React from "react";
 import { useRouter } from "next/router";
 import ImagePetDefauit from "@/public/assets/petimage.svg";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+
 interface Step1Props {
   formData: {
     name: string;
@@ -21,12 +23,18 @@ export default function Step1({
 }: Step1Props) {
   const router = useRouter();
   const [errorName, setErrorName] = useState<string>("");
-  console.log(formData.name);
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
+    // ทำให้ React รู้ว่าเป็นไคลเอ็นต์
     if (formData.name !== "") {
       setErrorName("");
     }
+    setIsClient(true);
   }, [formData.name]);
+
+
+
   const handleChangePageCheck = () => {
     if (formData.name === "") {
       setErrorName("Please enter your pet name");
@@ -34,6 +42,11 @@ export default function Step1({
     }
     nextStep();
   };
+
+  if (!isClient) {
+    // หากไม่ใช่ไคลเอ็นต์ให้ไม่ทำอะไร หรือสามารถแสดง fallback ได้
+    return null;
+  }
 
   return (
     <div className=" bg-white ">
@@ -64,14 +77,14 @@ export default function Step1({
       {/* Main content */}
       <div className="max-w-96 mx-auto h-auto ">
         <div className="grid grid-cols-1 ">
-          <div className="aspect-square bg-[#FFF5F2] rounded-xl flex flex-col items-center justify-center gap-4 transition-colors ">
+          <div className="aspect-square bg-[#FFF5F2] rounded-xl flex flex-col items-center justify-center gap-4 transition-colors py-10">
             <div className="flex flex-col items-center gap-4">
               <div className="relative">
                 <div className="avatar">
                   <div className="w-32 h-32 rounded-full bg-base-200 ring ring-[#FF5C00] ring-offset-base-100 ring-offset-2 ">
                     {formData.imageUrl ? (
                       <img
-                        src={formData.imageUrl || ImagePetDefauit}
+                        src={formData.imageUrl || ImagePetDefauit} // ใช้ path ที่สัมพันธ์กับ public
                         alt="Avatar"
                         className="w-full h-full object-cover"
                       />
@@ -79,10 +92,10 @@ export default function Step1({
                       <div className="flex items-center justify-center w-full h-full">
                         <div className="w-[80%] h-auto flex items-center justify-center">
                           <Image
-                            src={ImagePetDefauit}
+                            src="/assets/petimage.svg" // ใช้ path ที่สัมพันธ์กับ public
                             alt="petimage"
-                            width={10}
-                            height={10}
+                            width={100} // กำหนดขนาดให้เหมาะสม
+                            height={100} // กำหนดขนาดให้เหมาะสม
                             className="object-cover"
                           />
                         </div>
@@ -148,7 +161,7 @@ export default function Step1({
         {/* Navigation buttons */}
         <div className="flex justify-between mt-12">
           <button
-            className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00]  transition-colors"
+            className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] transition-colors"
             onClick={() => router.push("/")}
           >
             Back

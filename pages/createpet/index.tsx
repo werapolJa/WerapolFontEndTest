@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Step1 from "@/components/step1";
 import Step2 from "@/components/step2";
 import Step3 from "@/components/step3";
@@ -8,19 +8,41 @@ import Step3 from "@/components/step3";
 export default function CreatePet() {
   const [step, setStep] = useState(1);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    age: "",
-    breed: "",
-    imageUrl: "",
-    pettype_id: 0,
-    experience: "",
-    pet_sex: "",
-    color: "",
-    weight: "",
-    about: "",
-    disease: false,
+  const [formData, setFormData] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedData = localStorage.getItem("formData");
+      if (savedData) {
+        try {
+          return JSON.parse(savedData);
+        } catch (error) {
+          console.error("Error parsing formData from localStorage", error);
+        }
+      }
+    }
+    return {
+      name: "",
+      age: "",
+      breed: "",
+      imageUrl: "",
+      pettype_id: 0,
+      experience: "",
+      pet_sex: "",
+      color: "",
+      weight: "",
+      about: "",
+      disease: false,
+    };
   });
+
+  useEffect(() => {
+    // ตรวจสอบการเปลี่ยนแปลงของ formData และอัปเดต localStorage เฉพาะเมื่อมีการเปลี่ยนแปลงจริงๆ
+    if (typeof window !== "undefined") {
+      const savedData = localStorage.getItem("formData");
+      if (savedData && savedData !== JSON.stringify(formData)) {
+        localStorage.setItem("formData", JSON.stringify(formData));
+      }
+    }
+  }, [formData]); // จะอัปเดต localStorage เฉพาะเมื่อ formData เปลี่ยนแปลง
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
@@ -31,7 +53,7 @@ export default function CreatePet() {
     >
   ) => {
     const { name, value, type } = e.target;
-    setFormData((prev) => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       [name]:
         type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
@@ -42,12 +64,13 @@ export default function CreatePet() {
     const file = event.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      setFormData((prev) => ({
+      setFormData((prev: FormData) => ({
         ...prev,
-        imageUrl: url, // อัพเดต imageUrl ด้วย URL ของไฟล์ที่ถูกเลือก
+        imageUrl: url,
       }));
     }
   };
+
   const renderStep = () => {
     switch (step) {
       case 1:
