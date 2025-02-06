@@ -157,9 +157,9 @@ export default function Step2({
                 <option value="0" disabled>
                   Select Type
                 </option>
-                <option value="1">Dog</option>
-                <option value="2">Cat</option>
-                <option value="3">Bird</option>
+                <option value="2">Dog</option>
+                <option value="3">Cat</option>
+                <option value="4">Bird</option>
               </select>
 
               {/* SelectSex */}

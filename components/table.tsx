@@ -24,7 +24,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   // console.log(data);
   const [popUpEdit, setPopUpEdit] = useState<boolean>(false);
   const [popUpDelete, setPopUpDelete] = useState<boolean>(false);
-  console.log(popUpDelete);
+  // console.log(popUpDelete);
 
   return (
     <div className="min-w-80 md:w-full">
@@ -51,7 +51,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
               key={item.pet_id}
               className="border-b border-gray-200 last:border-0 min-w-80 md:w-full "
             >
-              <td className="px-4 py-3">{item.pet_name}</td>
+              <td className="px-4 py-3 w-64">{item.pet_name}</td>
               <td className="px-4 py-3">{item.breed}</td>
               <td className="px-4 py-3">
                 {new Date(item.create_at).toLocaleDateString()}

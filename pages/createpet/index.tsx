@@ -19,11 +19,12 @@ export default function CreatePet() {
         }
       }
     }
+
     return {
-      name: "",
+      pet_name: "",
       age: "",
       breed: "",
-      imageUrl: "",
+      image_pet: "",
       pettype_id: 0,
       experience: "",
       pet_sex: "",
@@ -33,12 +34,11 @@ export default function CreatePet() {
       disease: false,
     };
   });
-
+  console.log(formData);
   useEffect(() => {
     // ตรวจสอบการเปลี่ยนแปลงของ formData และอัปเดต localStorage เฉพาะเมื่อมีการเปลี่ยนแปลงจริงๆ
     if (typeof window !== "undefined") {
-      const savedData = localStorage.getItem("formData");
-      if (savedData && savedData !== JSON.stringify(formData)) {
+      if (typeof window !== "undefined") {
         localStorage.setItem("formData", JSON.stringify(formData));
       }
     }
@@ -66,9 +66,29 @@ export default function CreatePet() {
       const url = URL.createObjectURL(file);
       setFormData((prev: FormData) => ({
         ...prev,
-        imageUrl: url,
+        image_pet: url,
       }));
     }
+  };
+  const resetFormData = () => {
+    setFormData({
+      pet_name: "",
+      age: "",
+      breed: "",
+      image_pet: "",
+      pettype_id: 0,
+      experience: "",
+      pet_sex: "",
+      color: "",
+      weight: "",
+      about: "",
+      disease: false,
+    });
+
+    // Also clear the form data from localStorage
+    localStorage.removeItem("formData");
+
+    console.log("Form data has been reset.");
   };
 
   const renderStep = () => {
@@ -97,6 +117,7 @@ export default function CreatePet() {
             formData={formData}
             handleChange={handleChange}
             prevStep={prevStep}
+            resetFormData={resetFormData}
           />
         );
       default:

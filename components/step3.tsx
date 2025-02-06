@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import CloseIcon from "@/public/assets/close-icon.svg";
 import Image from "next/image";
 import ImagePetDefauit from "@/public/assets/petimage.svg";
+import axios from "axios";
+import { useRouter } from "next/router";
 interface Step3Props {
   formData: {
-    name: string;
-    imageUrl: string;
+    pet_name: string;
+    image_pet: string;
     age: string;
     breed: string;
     pettype_id: number;
@@ -18,12 +20,16 @@ interface Step3Props {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
   prevStep: () => void;
+  resetFormData: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
 }
 
 export default function Step3({
   formData,
   handleChange,
   prevStep,
+  resetFormData,
 }: Step3Props) {
   useEffect(() => {
     if (formData.about !== "") {
@@ -32,7 +38,8 @@ export default function Step3({
   }, [formData.about]);
   const [errorAbout, setErrorAbout] = useState<string>("");
   const [popUp, setPopUp] = useState<boolean>(false);
-  console.log(formData);
+  const router = useRouter();
+  // console.log(formData);
   const handleChangeCheckPage = (e: React.FormEvent) => {
     e.preventDefault();
     let isValid = true;
@@ -42,19 +49,26 @@ export default function Step3({
     }
     if (isValid) {
       setPopUp(!popUp);
-      console.log(isValid);
+      // console.log(isValid);
     }
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Pet profile submitted:", formData);
-    alert("Pet profile created successfully!");
+    try {
+      await axios.post(`/api/pet`, formData);
+
+      // Pass an empty event to resetFormData
+      resetFormData({} as React.ChangeEvent<HTMLInputElement>);
+      router.push("/")
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   return (
     <>
       {" "}
-      <form onSubmit={handleChangeCheckPage}>
+      <form>
         <div className="bg-white ">
           <div className="flex items-center justify-center mb-12">
             <div className="flex items-center space-x-4">
@@ -126,7 +140,7 @@ export default function Step3({
                 Back
               </button>
               <button
-                type="submit"
+                onClick={handleChangeCheckPage}
                 className={`${
                   errorAbout
                     ? "px-6 py-2 rounded-full bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -141,8 +155,8 @@ export default function Step3({
       </form>
       {/* popup detail */}
       {popUp && (
-        <div className="  fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center md:p-4  ">
-          <div className="bg-white  shadow-xl w-full h-full md:h-auto md:w-[800px] md:rounded-3xl">
+        <div className=" fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center md:p-4 overflow-y-auto ">
+          <div className="bg-white  shadow-xl w-full h- md:h-auto md:w-[800px] md:rounded-3xl">
             <div className="flex justify-between items-center py-6 mx-4 md:mx-10">
               <h2 className="text-2xl font-bold ">Pet Detail</h2>
 
@@ -160,9 +174,9 @@ export default function Step3({
               <div className="relative">
                 <div className="avatar">
                   <div className="w-32 h-32 rounded-full bg-base-200 ring ring-[#FF5C00] ring-offset-base-100 ring-offset-2 ">
-                    {formData.imageUrl ? (
+                    {formData.image_pet ? (
                       <img
-                        src={formData.imageUrl || ImagePetDefauit}
+                        src={formData.image_pet || ImagePetDefauit}
                         alt="Avatar"
                         className="w-full h-full object-cover"
                       />
@@ -190,7 +204,7 @@ export default function Step3({
                   Pet Name
                 </h3>
                 <div className="text-base  mb-2 mx-4 md:mx-10">
-                  {formData.name}
+                  {formData.pet_name}
                 </div>
               </div>
               <div className="">
@@ -251,7 +265,7 @@ export default function Step3({
                 </div>
               </div>
             </div>
-            
+
             {/* textarea  */}
             <h1 className="mx-4 mb-2 md:mx-10">About</h1>
             <div className="flex flex-col w-auto mx-4 gap-2 md:w-[90%]  md:mx-auto">
@@ -266,13 +280,14 @@ export default function Step3({
                 className="textarea textarea-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md"
               />
             </div>
-            <div className="flex justify-center items-center mb-6 mx-4 md:mx-10 my-10">
+            <div className="flex justify-center items-center  mx-4 md:mx-10 my-5">
               <h1
                 className={`${
                   errorAbout
-                    ? "px-6 py-2 rounded-full bg-gray-200 text-gray-400 cursor-not-allowed"
+                    ? "px-6 py-2 rounded-full  text-white cursor-not-allowed"
                     : "px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] "
                 }`}
+                onClick={handleSubmit}
               >
                 Confime
               </h1>

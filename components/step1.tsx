@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 
 interface Step1Props {
   formData: {
-    name: string;
-    imageUrl: string;
+    pet_name: string;
+    image_pet: string;
   };
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   nextStep: () => void;
@@ -27,16 +27,16 @@ export default function Step1({
 
   useEffect(() => {
     // ทำให้ React รู้ว่าเป็นไคลเอ็นต์
-    if (formData.name !== "") {
+    if (formData.pet_name !== "") {
       setErrorName("");
     }
     setIsClient(true);
-  }, [formData.name]);
+  }, [formData.pet_name]);
 
 
 
   const handleChangePageCheck = () => {
-    if (formData.name === "") {
+    if (formData.pet_name === "") {
       setErrorName("Please enter your pet name");
       return;
     }
@@ -82,9 +82,9 @@ export default function Step1({
               <div className="relative">
                 <div className="avatar">
                   <div className="w-32 h-32 rounded-full bg-base-200 ring ring-[#FF5C00] ring-offset-base-100 ring-offset-2 ">
-                    {formData.imageUrl ? (
+                    {formData.image_pet ? (
                       <img
-                        src={formData.imageUrl || ImagePetDefauit} // ใช้ path ที่สัมพันธ์กับ public
+                        src={formData.image_pet || ImagePetDefauit} // ใช้ path ที่สัมพันธ์กับ public
                         alt="Avatar"
                         className="w-full h-full object-cover"
                       />
@@ -142,9 +142,9 @@ export default function Step1({
               )}
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                id="pet_name"
+                name="pet_name"
+                value={formData.pet_name}
                 onChange={handleChange}
                 placeholder="Enter your pet name"
                 required

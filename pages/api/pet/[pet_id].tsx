@@ -25,7 +25,7 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       let query = `
-        SELECT pet_name, pettype_id, breed, pet_sex, age, color, weight, about, image
+        SELECT pet_name, pettype_id, breed, pet_sex, age, color, weight, about, "image_pet"
         FROM pet
         WHERE pet_id = $1
       `;
@@ -59,7 +59,7 @@ export default async function handler(
       age,
       color,
       weight,
-      image,
+      image_pet,
       about,
     } = req.body;
 
@@ -100,7 +100,7 @@ export default async function handler(
       // Update the pet information
       const petUpdateQuery = `
         UPDATE pet
-        SET pet_name = $1, pettype_id = $2, breed = $3, pet_sex = $4, age = $5, color = $6, weight = $7, image = $8, about = $9
+        SET pet_name = $1, pettype_id = $2, breed = $3, pet_sex = $4, age = $5, color = $6, weight = $7, "image_pet" = $8, about = $9
         WHERE pet_id = $10
         RETURNING *;
       `;
@@ -113,7 +113,7 @@ export default async function handler(
         age,
         color,
         weight,
-        image,
+        image_pet,
         about,
         pet_id,
       ]);
