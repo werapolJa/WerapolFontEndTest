@@ -1,6 +1,7 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CloseIcon from "@/public/assets/close-icon.svg";
+import axios from "axios";
 type Pet = {
   pet_id: number;
   pettype_id: number;
@@ -24,8 +25,20 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   // console.log(data);
   const [popUpEdit, setPopUpEdit] = useState<boolean>(false);
   const [popUpDelete, setPopUpDelete] = useState<boolean>(false);
-  // console.log(popUpDelete);
+  const [idDelete, setIdDelete] = useState<number>(0);
+  const [idDEdit, setIdDEdit] = useState<number>(0);
 
+  useEffect(() => {}, [idDelete, idDEdit]);
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`api/pet/${idDelete}`);
+      setPopUpDelete(false)
+      window.location.reload()
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="min-w-80 md:w-full">
       <table className="w-full text-sm">
@@ -59,13 +72,19 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
               <td className="px-4 py-3 flex justify-end gap-2 w-full">
                 <button
                   className="h-8 w-8 border border-gray-200 rounded-md hover:bg-gray-50"
-                  onClick={() => setPopUpEdit(!popUpEdit)}
+                  onClick={() => {
+                    setPopUpEdit(!popUpEdit);
+                    setIdDEdit(item.pet_id);
+                  }}
                 >
                   ✏️
                 </button>
                 <button
                   className="h-8 w-8 border border-gray-200 rounded-md hover:bg-gray-50"
-                  onClick={() => setPopUpDelete(!popUpDelete)}
+                  onClick={() => {
+                    setPopUpDelete(!popUpDelete);
+                    setIdDelete(item.pet_id);
+                  }}
                 >
                   ❌
                 </button>
@@ -178,10 +197,10 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
       )}
 
       {popUpDelete && (
-        <div className="  fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center md:p-4  ">
-          <div className="bg-white  shadow-xl w-full h-full md:h-auto md:w-[800px] md:rounded-3xl">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center md:p-4">
+          <div className="absolute bg-white bottom-0 shadow-xl w-full h-[80%] md:top-1/2 md:left-1/2 md:transform md:-translate-x-1/2 md:-translate-y-1/2 md:w-[500px] md:h-[300px] md:rounded-3xl">
             <div className="flex justify-between items-center py-6 mx-4 md:mx-10">
-              <h2 className="text-2xl font-bold ">Pet Detail</h2>
+              <h2 className="text-2xl font-bold">Pet Delete</h2>
               <Image
                 src={CloseIcon}
                 alt="close button"
@@ -190,9 +209,17 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
               />
             </div>
             {/* Line เส้นกั้น */}
-
             <div className="flex justify-center items-center mb-6 mx-4 md:mx-10 my-10">
-              <h1>Confime</h1>
+              <h1>"Would you like to delete your pet's information?"</h1>
+            </div>
+            <div className="flex justify-center items-center mb-6 mx-4 md:mx-10 mt-10">
+              <button
+                className="bg-red-500 text-white px-6 py-3 rounded-lg hover:cursor-pointer hover:bg-red-600 "
+                onClick={handleDelete}
+                // onClick={}
+              >
+                confirm
+              </button>
             </div>
           </div>
         </div>
