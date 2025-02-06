@@ -76,8 +76,7 @@ export default async function handler(
       !breed ||
       !pet_sex ||
       !age ||
-      !color ||
-      !weight ||
+
       !about
     ) {
       return res
@@ -100,8 +99,8 @@ export default async function handler(
       // Update the pet information
       const petUpdateQuery = `
         UPDATE pet
-        SET pet_name = $1, pettype_id = $2, breed = $3, pet_sex = $4, age = $5, color = $6, weight = $7, "image_pet" = $8, about = $9
-        WHERE pet_id = $10
+        SET pet_name = $1, pettype_id = $2, breed = $3, pet_sex = $4, age = $5,  "image_pet" = $6, about = $7
+        WHERE pet_id = $8
         RETURNING *;
       `;
 
@@ -111,8 +110,7 @@ export default async function handler(
         breed,
         pet_sex,
         age,
-        color,
-        weight,
+
         image_pet,
         about,
         pet_id,

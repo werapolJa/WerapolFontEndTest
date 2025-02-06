@@ -27,14 +27,148 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   const [popUpDelete, setPopUpDelete] = useState<boolean>(false);
   const [idDelete, setIdDelete] = useState<number>(0);
   const [idDEdit, setIdDEdit] = useState<number>(0);
+  const [petDataEdit, setPetDataEdit] = useState<Pet[]>([]);
+  const [petnameEdit, setPetnameEdit] = useState<string>("");
+  const [petbreedEdit, setPetbreedEdit] = useState<string>("");
+  const [petAboutEdit, setPetAboutEdit] = useState<string>("");
+  const [petTypeEdit, setPetTypeEdit] = useState<number>(0);
+  const [petageEdit, setPetAgeEdit] = useState<number>(0);
+  const [petsSxEdit, setPetsexEdit] = useState<string>("");
 
-  useEffect(() => {}, [idDelete, idDEdit]);
+  const [errorName, setErrorName] = useState<string>("");
+  const [errorType, setErrorType] = useState<string>("");
+  const [errorSex, setErrorSex] = useState<string>("");
 
+  // console.log(petnameEdit);
+  // console.log(petbreedEdit);
+  // console.log(petageEdit);
+  // console.log(petAboutEdit);
+  // console.log(petTypeEdit);
+  // console.log(petsSxEdit);
+
+  useEffect(() => {
+    if (idDEdit !== 0) {
+      getDatePetById();
+    }
+  }, [idDelete, idDEdit]);
+
+  const getDatePetById = async () => {
+    const res = await axios.get(`api/pet/${idDEdit}`);
+    const dataEdit = res.data.data;
+    // console.log(dataEdit[0].pet_name);
+
+    setPetDataEdit(dataEdit);
+    setPetnameEdit(dataEdit[0].pet_name);
+    setPetbreedEdit(dataEdit[0].breed);
+    setPetAgeEdit(dataEdit[0].age);
+    setPetAboutEdit(dataEdit[0].about);
+    setPetTypeEdit(dataEdit[0].pettype_id);
+    setPetsexEdit(dataEdit[0].pet_sex);
+  };
+  const handlePetnameEditChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newPetName = event.target.value;
+    setPetnameEdit(newPetName);
+    setPetDataEdit((prevData) => {
+      const updatedData = [...prevData];
+      updatedData[0] = { ...updatedData[0], pet_name: newPetName };
+      return updatedData;
+    });
+  };
+  const handlebreedEditChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newBreed = event.target.value;
+    setPetbreedEdit(newBreed);
+    setPetDataEdit((prevData) => {
+      const updatedData = [...prevData];
+      updatedData[0] = { ...updatedData[0], breed: newBreed };
+      return updatedData;
+    });
+  };
+  const handleageEditChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newAge = event.target.value;
+
+    if (newAge === "") {
+      setPetAgeEdit(0); // ใช้ 0 แทน null
+      setPetDataEdit((prevData) => {
+        const updatedData = [...prevData];
+        updatedData[0] = { ...updatedData[0], age: 0 }; // ใช้ 0 แทน null
+        return updatedData;
+      });
+    } else {
+      const ageNumber = parseInt(newAge, 10);
+
+      if (!isNaN(ageNumber)) {
+        setPetAgeEdit(ageNumber);
+        setPetDataEdit((prevData) => {
+          const updatedData = [...prevData];
+          updatedData[0] = { ...updatedData[0], age: ageNumber };
+          return updatedData;
+        });
+      }
+    }
+  };
+  const handlePetaboutEditChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const newAbout = event.target.value;
+    setPetAboutEdit(newAbout);
+    setPetDataEdit((prevData) => {
+      const updatedData = [...prevData];
+      updatedData[0] = { ...updatedData[0], about: newAbout };
+      return updatedData;
+    });
+  };
+  const handlePetTypeEditChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newPetType = parseInt(event.target.value, 10); // Get the new pet type ID
+    setPetTypeEdit(newPetType);
+    setPetDataEdit((prevData) => {
+      const updatedData = [...prevData]; // Copy the existing pet data
+      updatedData[0] = { ...updatedData[0], pettype_id: newPetType }; // Update the pet type
+      return updatedData; // Return the updated data
+    });
+  };
+  const handlePeSexEditChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newPetSex = event.target.value; // Get the string value "M" or "F"
+    setPetsexEdit(newPetSex);
+    // Ensure newPetSex is valid ("M" or "F")
+    if (newPetSex === "M" || newPetSex === "F") {
+      setPetDataEdit((prevData) => {
+        const updatedData = [...prevData]; // Copy the existing pet data
+        updatedData[0] = { ...updatedData[0], pet_sex: newPetSex }; // Update the pet sex
+        return updatedData; // Return the updated data
+      });
+    }
+  };
+
+  const handleEditPet = async () => {
+    try {
+      const data = {
+        pet_name: petnameEdit,
+        pettype_id: petTypeEdit,
+        breed: petbreedEdit,
+        pet_sex: petsSxEdit,
+        age: petageEdit,
+        about: petAboutEdit,
+      };
+
+      console.log(data);
+
+      await axios.put(`/api/pet/${idDEdit}`, data);
+      window.location.reload();
+    } catch (error) {}
+  };
   const handleDelete = async () => {
     try {
       await axios.delete(`api/pet/${idDelete}`);
-      setPopUpDelete(false)
-      window.location.reload()
+      setPopUpDelete(false);
+      window.location.reload();
     } catch (error) {
       console.log(error);
     }
@@ -119,78 +253,150 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
             {/* Name and Age */}
             <div className="grid grid-cols-1 md:grid-cols-2 mt-5 md:mb-5">
               <div className="">
-                <h3 className="text-xl  mb-2 mx-4 md:mx-10 text-gray-400  ">
-                  Pet Name
-                </h3>
-                <div className="text-base  mb-2 mx-4 md:mx-10">
-                  <input type="text" name="" id="" />
+                <div className="flex flex-col w-auto mx-5 gap-2">
+                  {errorName ? (
+                    <span className="text-red-500 font-bold">{errorName}</span>
+                  ) : (
+                    <span className="text-[#FF5C00]">Pet Name</span>
+                  )}
+                  <input
+                    type="text"
+                    id="pet_name"
+                    name="pet_name"
+                    value={petDataEdit[0]?.pet_name || ""}
+                    onChange={handlePetnameEditChange}
+                    placeholder="Enter your pet name"
+                    required
+                    className={`${
+                      errorName
+                        ? "input-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md"
+                        : "input-bordered focus-within:outline-none focus-within:border-orange-500 border py-2 w-full px-2  rounded-md"
+                    } `}
+                  />
                 </div>
               </div>
               <div className="">
-                <h3 className="text-xl  mb-2 mx-4 md:mx-10 text-gray-400">
-                  Pet Age
-                </h3>
-                <div className="text-base  mb-2 mx-4 md:mx-10">
-                  <input type="text" name="" id="" />
+                <div className="flex flex-col w-auto mx-5 gap-2">
+                  {errorName ? (
+                    <span className="text-red-500 font-bold">{errorName}</span>
+                  ) : (
+                    <span className="text-[#FF5C00]">Pet Age</span>
+                  )}
+                  <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    value={petDataEdit[0]?.age || ""}
+                    onChange={handleageEditChange}
+                    placeholder="Enter your pet name"
+                    required
+                    className={`${
+                      errorName
+                        ? "input-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md"
+                        : "input-bordered focus-within:outline-none focus-within:border-orange-500 border py-2 w-full px-2  rounded-md"
+                    } `}
+                  />
                 </div>
               </div>
             </div>
             {/* Breed  and Sex*/}
             <div className="grid grid-cols-1 md:grid-cols-2 md:mb-5">
-              <div className="">
-                <h3 className="text-xl  mb-2 mx-4 md:mx-10 text-gray-400">
-                  Breed
-                </h3>
-                <div className="text-base  mb-2 mx-4 md:mx-10">
-                  <input type="text" name="" id="" />
+              <div className="flex flex-col w-auto mx-5 gap-2">
+                <div className="">
+                  {errorName ? (
+                    <span className="text-red-500 font-bold">{errorName}</span>
+                  ) : (
+                    <span className="text-[#FF5C00]">breed</span>
+                  )}
+                  <input
+                    type="text"
+                    id="breed"
+                    name="breed"
+                    value={petDataEdit[0]?.breed}
+                    onChange={handlebreedEditChange}
+                    placeholder="Enter your pet name"
+                    required
+                    className={`${
+                      errorName
+                        ? "input-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md"
+                        : "input-bordered focus-within:outline-none focus-within:border-orange-500 border py-2 w-full px-2  rounded-md"
+                    } `}
+                  />
                 </div>
               </div>
               <div className="">
-                <h3 className="text-xl  mb-2 mx-4 md:mx-10 text-gray-400">
-                  Sex
-                </h3>
-                <div className="text-base  mb-2 mx-4 md:mx-10">
-                  <input type="text" name="" id="" />
+                <div className="flex flex-col w-auto mx-5 ">
+                  {errorSex ? (
+                    <span className="text-red-500 font-bold">{errorSex}</span>
+                  ) : (
+                    <span className="text-[#FF5C00]">Sex</span>
+                  )}
+                  <select
+                    id="pet_sex"
+                    name="pet_sex"
+                    value={
+                      petDataEdit.length > 0 &&
+                      (petDataEdit[0].pet_sex === "M" ||
+                        petDataEdit[0].pet_sex === "F")
+                        ? petDataEdit[0].pet_sex
+                        : "M" // Fallback to "M" if pet_sex is invalid or empty
+                    }
+                    onChange={handlePeSexEditChange} // Update handler to use string values
+                    required
+                    disabled={petDataEdit.length === 0}
+                    className="input-bordered focus-within:outline-none  focus-within:border-orange-500 border px-2 py-2 w-full rounded-md cursor-pointer"
+                  >
+            
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                  </select>
                 </div>
               </div>
             </div>
 
             {/* pettype  */}
             <div className="grid grid-cols-1 md:grid-cols-2 md:mb-5 ">
-              <div className="">
-                <h3 className="text-xl  mb-2 mx-4 md:mx-10 text-gray-400">
-                  Type
-                </h3>
-                <div className="text-base  mb-2 mx-4 md:mx-10">
-                  <input type="text" name="" id="" />
-                </div>
-              </div>
-              <div className="">
-                <h3 className="text-xl mb-2 mx-4 md:mx-10 text-gray-400">
-                  Disease
-                </h3>
-                <div className="text-base  mb-2 mx-4 md:mx-10">
-                  <input type="text" />
-                </div>
+              <div className="flex flex-col w-auto mx-5 gap-2">
+                {errorType ? (
+                  <span className="text-red-500 font-bold">{errorType}</span>
+                ) : (
+                  <span className="text-[#FF5C00]">Type</span>
+                )}
+                <select
+                  id="pettype_id"
+                  name="pettype_id"
+                  value={
+                    petDataEdit.length > 0 ? petDataEdit[0].pettype_id : ""
+                  }
+                  onChange={handlePetTypeEditChange} // Handle the change if needed
+                  required
+                  disabled={petDataEdit.length === 0}
+                  className={`
+                      input-bordered focus-within:outline-none  focus-within:border-orange-500 border px-2 py-2 w-full rounded-md cursor-pointer`}
+                >
+                 
+                  <option value="2">Dog</option>
+                  <option value="3">Cat</option>
+                  <option value="4">Bird</option>
+                </select>
               </div>
             </div>
 
             {/* textarea  */}
-            <h1 className="mx-4 mb-2 md:mx-10">About</h1>
-            <div className="flex flex-col w-auto mx-4 gap-2 md:w-[90%]  md:mx-auto">
+            <h1 className="mx-4 mb-2 md:mx-5">About</h1>
+            <div className="flex flex-col w-auto mx-4 gap-2 md:w-[95%]  md:mx-auto">
               <textarea
                 id="about"
                 name="about"
-                // value={formData.about}
-                disabled
+                value={petDataEdit[0]?.about || ""} // Ensure value is always a string
                 placeholder="Describe more about your pet..."
-                // onChange={handleChange}
+                onChange={handlePetaboutEditChange}
                 rows={4}
-                className="textarea textarea-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md"
+                className="textarea textarea-bordered focus-within:outline-none  focus-within:border-orange-500 border px-2 py-2 w-full rounded-md"
               />
             </div>
             <div className="flex justify-center items-center mb-6 mx-4 md:mx-10 my-10">
-              <h1>Confime</h1>
+              <h1 onClick={handleEditPet}>Confime</h1>
             </div>
           </div>
         </div>
