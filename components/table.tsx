@@ -23,6 +23,8 @@ interface DataTableProps {
 const Table: React.FC<DataTableProps> = ({ data }) => {
   // console.log(data);
   const [popUpEdit, setPopUpEdit] = useState<boolean>(false);
+  const [popUpDelete, setPopUpDelete] = useState<boolean>(false);
+  console.log(popUpDelete);
 
   return (
     <div className="min-w-80 md:w-full">
@@ -61,7 +63,10 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                 >
                   ✏️
                 </button>
-                <button className="h-8 w-8 border border-gray-200 rounded-md hover:bg-gray-50">
+                <button
+                  className="h-8 w-8 border border-gray-200 rounded-md hover:bg-gray-50"
+                  onClick={() => setPopUpDelete(!popUpDelete)}
+                >
                   ❌
                 </button>
               </td>
@@ -165,6 +170,27 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                 className="textarea textarea-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md"
               />
             </div>
+            <div className="flex justify-center items-center mb-6 mx-4 md:mx-10 my-10">
+              <h1>Confime</h1>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {popUpDelete && (
+        <div className="  fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center md:p-4  ">
+          <div className="bg-white  shadow-xl w-full h-full md:h-auto md:w-[800px] md:rounded-3xl">
+            <div className="flex justify-between items-center py-6 mx-4 md:mx-10">
+              <h2 className="text-2xl font-bold ">Pet Detail</h2>
+              <Image
+                src={CloseIcon}
+                alt="close button"
+                className="cursor-pointer"
+                onClick={() => setPopUpDelete(!popUpDelete)}
+              />
+            </div>
+            {/* Line เส้นกั้น */}
+
             <div className="flex justify-center items-center mb-6 mx-4 md:mx-10 my-10">
               <h1>Confime</h1>
             </div>
