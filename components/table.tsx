@@ -16,6 +16,7 @@ type Pet = {
   about?: string;
   create_at: string;
   update_at: string;
+  ChangeLanguage: boolean;
 };
 interface DataTableProps {
   data: Pet[];
@@ -53,17 +54,23 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   }, [idDelete, idDEdit]);
 
   const getDatePetById = async () => {
-    const res = await axios.get(`api/pet/${idDEdit}`);
-    const dataEdit = res.data.data;
-    // console.log(dataEdit[0].pet_name);
+    try {
+      const res = await axios.get(`api/pet/${idDEdit}`);
+      const dataEdit = res.data.data;
+      setPetDataEdit(dataEdit);
+      setPetnameEdit(dataEdit[0].pet_name);
+      setPetbreedEdit(dataEdit[0].breed);
+      setPetAgeEdit(dataEdit[0].age);
+      setPetAboutEdit(dataEdit[0].about);
+      setPetTypeEdit(dataEdit[0].pettype_id);
+      setPetsexEdit(dataEdit[0].pet_sex);
 
-    setPetDataEdit(dataEdit);
-    setPetnameEdit(dataEdit[0].pet_name);
-    setPetbreedEdit(dataEdit[0].breed);
-    setPetAgeEdit(dataEdit[0].age);
-    setPetAboutEdit(dataEdit[0].about);
-    setPetTypeEdit(dataEdit[0].pettype_id);
-    setPetsexEdit(dataEdit[0].pet_sex);
+      setErrorName("");
+      setErrorType("");
+      setErrorSex("");
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handlePetnameEditChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -158,11 +165,13 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
         about: petAboutEdit,
       };
 
-      console.log(data);
+      // console.log(data);
 
       await axios.put(`/api/pet/${idDEdit}`, data);
       window.location.reload();
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleDelete = async () => {
     try {
@@ -346,7 +355,6 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                     disabled={petDataEdit.length === 0}
                     className="input-bordered focus-within:outline-none  focus-within:border-orange-500 border px-2 py-2 w-full rounded-md cursor-pointer"
                   >
-            
                     <option value="M">Male</option>
                     <option value="F">Female</option>
                   </select>
@@ -374,7 +382,6 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                   className={`
                       input-bordered focus-within:outline-none  focus-within:border-orange-500 border px-2 py-2 w-full rounded-md cursor-pointer`}
                 >
-                 
                   <option value="2">Dog</option>
                   <option value="3">Cat</option>
                   <option value="4">Bird</option>
@@ -396,7 +403,12 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
               />
             </div>
             <div className="flex justify-center items-center mb-6 mx-4 md:mx-10 my-10">
-              <h1 onClick={handleEditPet}>Confime</h1>
+              <h1
+                onClick={handleEditPet}
+                className="cursor-pointer bg-[#FF5C00] text-white px-3 rounded-lg py-2"
+              >
+                Confime
+              </h1>
             </div>
           </div>
         </div>
@@ -412,11 +424,13 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                 alt="close button"
                 className="cursor-pointer"
                 onClick={() => setPopUpDelete(!popUpDelete)}
+                width={100}
+                height={100}
               />
             </div>
             {/* Line เส้นกั้น */}
             <div className="flex justify-center items-center mb-6 mx-4 md:mx-10 my-10">
-              <h1>"Would you like to delete your pet's information?"</h1>
+              <h1>Would you like to delete your pet information?</h1>
             </div>
             <div className="flex justify-center items-center mb-6 mx-4 md:mx-10 mt-10">
               <button

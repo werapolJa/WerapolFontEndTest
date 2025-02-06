@@ -5,6 +5,9 @@ import Step1 from "@/components/step1";
 import Step2 from "@/components/step2";
 import Step3 from "@/components/step3";
 
+interface ChangeLanguageType {
+  ChangeLanguage: boolean;
+}
 export default function CreatePet() {
   const [step, setStep] = useState(1);
 
@@ -32,9 +35,10 @@ export default function CreatePet() {
       weight: "",
       about: "",
       disease: false,
+      ChangeLanguage: true,
     };
   });
-  console.log(formData);
+  // console.log(formData);
   useEffect(() => {
     // ตรวจสอบการเปลี่ยนแปลงของ formData และอัปเดต localStorage เฉพาะเมื่อมีการเปลี่ยนแปลงจริงๆ
     if (typeof window !== "undefined") {
@@ -70,6 +74,14 @@ export default function CreatePet() {
       }));
     }
   };
+
+  const toggleLanguage = () => {
+    setFormData((prev: ChangeLanguageType) => ({
+      ...prev,
+      ChangeLanguage: !prev.ChangeLanguage, // สลับค่าระหว่าง true และ false
+    }));
+  };
+
   const resetFormData = () => {
     setFormData({
       pet_name: "",
@@ -83,12 +95,11 @@ export default function CreatePet() {
       weight: "",
       about: "",
       disease: false,
+      ChangeLanguage: true,
     });
 
     // Also clear the form data from localStorage
     localStorage.removeItem("formData");
-
-    console.log("Form data has been reset.");
   };
 
   const renderStep = () => {
@@ -100,6 +111,7 @@ export default function CreatePet() {
             handleChange={handleChange}
             nextStep={nextStep}
             handleImageUpload={handleImageUpload}
+            toggleLanguage={toggleLanguage}
           />
         );
       case 2:
@@ -109,6 +121,7 @@ export default function CreatePet() {
             handleChange={handleChange}
             nextStep={nextStep}
             prevStep={prevStep}
+            toggleLanguage={toggleLanguage}
           />
         );
       case 3:
@@ -118,6 +131,7 @@ export default function CreatePet() {
             handleChange={handleChange}
             prevStep={prevStep}
             resetFormData={resetFormData}
+            toggleLanguage={toggleLanguage}
           />
         );
       default:

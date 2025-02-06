@@ -16,6 +16,7 @@ type Pet = {
   about?: string;
   create_at: string;
   update_at: string;
+  ChangeLanguage: boolean;
 };
 
 const App: React.FC = () => {
@@ -41,7 +42,9 @@ const App: React.FC = () => {
 
       setPet(data);
       // console.log("resdata", data);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
   const renderPaginationButtons = () => {
     const buttons = [];

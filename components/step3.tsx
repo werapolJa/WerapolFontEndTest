@@ -1,3 +1,4 @@
+"use client";
 import type React from "react";
 import { useEffect, useState } from "react";
 import CloseIcon from "@/public/assets/close-icon.svg";
@@ -15,6 +16,7 @@ interface Step3Props {
     pet_sex: string;
     about: string;
     disease: boolean;
+    ChangeLanguage: boolean;
   };
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -23,6 +25,7 @@ interface Step3Props {
   resetFormData: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  toggleLanguage: () => void;
 }
 
 export default function Step3({
@@ -30,6 +33,7 @@ export default function Step3({
   handleChange,
   prevStep,
   resetFormData,
+  toggleLanguage,
 }: Step3Props) {
   useEffect(() => {
     if (formData.about !== "") {
@@ -37,6 +41,7 @@ export default function Step3({
     }
   }, [formData.about]);
   const [errorAbout, setErrorAbout] = useState<string>("");
+  const [errorAboutEn, setErrorAboutEn] = useState<string>("");
   const [popUp, setPopUp] = useState<boolean>(false);
   const router = useRouter();
   // console.log(formData);
@@ -45,6 +50,7 @@ export default function Step3({
     let isValid = true;
     if (formData.about === "") {
       setErrorAbout("Please enter your pet about");
+      setErrorAboutEn("กรุณาระบุสัตว์เลี้ยงของคุณเกี่ยวกับ");
       isValid = false;
     }
     if (isValid) {
@@ -59,7 +65,7 @@ export default function Step3({
 
       // Pass an empty event to resetFormData
       resetFormData({} as React.ChangeEvent<HTMLInputElement>);
-      router.push("/")
+      router.push("/");
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -68,76 +74,148 @@ export default function Step3({
   return (
     <>
       {" "}
-      <form>
+      <div>
         <div className="bg-white ">
-          <div className="flex items-center justify-center mb-12">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                <div className="bg-black text-white rounded-full w-8 h-8 flex items-center justify-center">
-                  1
-                </div>
-                <span className="ml-2 text-black font-medium">Basic</span>
-              </div>
-              <div className="flex items-center">
-                <div className="bg-black text-white rounded-full w-8 h-8 flex items-center justify-center">
-                  2
-                </div>
-                <span className="ml-2 text-black ">Additional</span>
-              </div>
-              <div className="flex items-center">
-                <div className="bg-[#FF5C00] text-white rounded-full w-8 h-8 flex items-center justify-center">
-                  3
-                </div>
-                <span className="ml-2 text-[#FF5C00]">Final</span>
+          <div className="max-w-xl mx-auto ">
+            <div className="text-2xl flex justify-end ">
+              <div
+                className="bg-[#FF5C00] p-2 rounded-full hidden text-white absolute top-32 md:inline cursor-pointer"
+                onClick={() => toggleLanguage()}
+              >
+                {formData.ChangeLanguage === true ? "EN" : "TH"}
               </div>
             </div>
+          </div>
+          <div className="flex items-center justify-center mb-12">
+            {formData.ChangeLanguage ? (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  <div className="bg-black text-white rounded-full w-8 h-8 flex items-center justify-center">
+                    1
+                  </div>
+                  <span className="ml-2 text-black font-medium">Basic</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="bg-black text-white rounded-full w-8 h-8 flex items-center justify-center">
+                    2
+                  </div>
+                  <span className="ml-2 text-black ">Additional</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="bg-[#FF5C00] text-white rounded-full w-8 h-8 flex items-center justify-center">
+                    3
+                  </div>
+                  <span className="ml-2 text-[#FF5C00]">Final</span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  <div className="bg-black text-white rounded-full w-8 h-8 flex items-center justify-center">
+                    1
+                  </div>
+                  <span className="ml-2 text-black font-medium">พื้นฐาน</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="bg-black text-white rounded-full w-8 h-8 flex items-center justify-center">
+                    2
+                  </div>
+                  <span className="ml-2 text-black ">ทั่วไป</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="bg-[#FF5C00] text-white rounded-full w-8 h-8 flex items-center justify-center">
+                    3
+                  </div>
+                  <span className="ml-2 text-[#FF5C00]">เพื่มเติม</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Main content */}
           <div className="max-w-96 mx-auto">
-            <div className="grid grid-cols-1">
-              <div className="aspect-square bg-[#FFF5F2] rounded-xl flex flex-col items-center justify-center gap-4 transition-colors py-10">
-                {errorAbout ? (
-                  <span className="text-red-500 font-bold">{errorAbout}</span>
-                ) : (
-                  <span className="text-[#FF5C00]">About Describe</span>
-                )}
-                <div className="flex flex-col w-[80%] gap-2">
-                  <textarea
-                    id="about"
-                    name="about"
-                    value={formData.about}
-                    placeholder="Describe more about your pet..."
-                    onChange={handleChange}
-                    rows={4}
-                    className="textarea textarea-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md"
-                  />
-                </div>
-                <div className="form-control">
-                  <label className="label cursor-pointer justify-start px-8 md:px-10">
-                    <input
-                      type="checkbox"
-                      id="disease"
-                      name="disease"
-                      checked={formData.disease}
+            {formData.ChangeLanguage ? (
+              <div className="grid grid-cols-1">
+                <div className="aspect-square bg-[#FFF5F2] rounded-xl flex flex-col items-center justify-center gap-4 transition-colors py-10">
+                  {errorAbout ? (
+                    <span className="text-red-500 font-bold">{errorAbout}</span>
+                  ) : (
+                    <span className="text-[#FF5C00]">About Describe</span>
+                  )}
+                  <div className="flex flex-col w-[80%] gap-2">
+                    <textarea
+                      id="about"
+                      name="about"
+                      value={formData.about}
+                      placeholder="Describe more about your pet..."
                       onChange={handleChange}
-                      className="checkbox bg-white"
+                      rows={4}
+                      className="textarea textarea-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md"
                     />
-                    <span className="label-text ml-2 text-sm md:text-base ">
-                      Does your pet not have any health problems?
-                    </span>
-                  </label>
+                  </div>
+                  <div className="form-control">
+                    <label className="label cursor-pointer justify-start px-8 md:px-10">
+                      <input
+                        type="checkbox"
+                        id="disease"
+                        name="disease"
+                        checked={formData.disease}
+                        onChange={handleChange}
+                        className="checkbox bg-white"
+                      />
+                      <span className="label-text ml-2 text-sm md:text-base ">
+                        Does your pet not have any health problems?
+                      </span>
+                    </label>
+                  </div>
                 </div>
               </div>
-            </div>
-
+            ) : (
+              <div className="grid grid-cols-1">
+                <div className="aspect-square bg-[#FFF5F2] rounded-xl flex flex-col items-center justify-center gap-4 transition-colors py-10">
+                  {errorAbout ? (
+                    <span className="text-red-500 font-bold">
+                      {errorAboutEn}
+                    </span>
+                  ) : (
+                    <span className="text-[#FF5C00]">อธิบายเพิ่มเติม</span>
+                  )}
+                  <div className="flex flex-col w-[80%] gap-2">
+                    <textarea
+                      id="about"
+                      name="about"
+                      value={formData.about}
+                      placeholder="อธิบายเพิ่มเติมเกี่ยวกับสัตว์เลี้ยงของคุณ.."
+                      onChange={handleChange}
+                      rows={4}
+                      className="textarea textarea-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md"
+                    />
+                  </div>
+                  <div className="form-control">
+                    <label className="label cursor-pointer justify-start px-8 md:px-10">
+                      <input
+                        type="checkbox"
+                        id="disease"
+                        name="disease"
+                        checked={formData.disease}
+                        onChange={handleChange}
+                        className="checkbox bg-white"
+                      />
+                      <span className="label-text ml-2 text-sm md:text-base ">
+                        สัตว์เลี้ยงของคุณไม่มีปัญหาสุขภาพใดๆ หรือไม่?
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Navigation buttons */}
             <div className="flex justify-between mt-12">
               <button
                 className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] hover:bg-[#FFE8E0] transition-colors"
                 onClick={prevStep}
               >
-                Back
+                {formData.ChangeLanguage ? "Back" : "กลับ"}
               </button>
               <button
                 onClick={handleChangeCheckPage}
@@ -147,12 +225,12 @@ export default function Step3({
                     : "px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] "
                 }`}
               >
-                Show Detail
+                {formData.ChangeLanguage ? "Show Detail" : "ดูรายละเอียด"}
               </button>
             </div>
           </div>
         </div>
-      </form>
+      </div>
       {/* popup detail */}
       {popUp && (
         <div className=" fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center md:p-4 overflow-y-auto ">
@@ -282,11 +360,7 @@ export default function Step3({
             </div>
             <div className="flex justify-center items-center  mx-4 md:mx-10 my-5">
               <h1
-                className={`${
-                  errorAbout
-                    ? "px-6 py-2 rounded-full  text-white cursor-not-allowed"
-                    : "px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] "
-                }`}
+                className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00]  cursor-pointer"
                 onClick={handleSubmit}
               >
                 Confime

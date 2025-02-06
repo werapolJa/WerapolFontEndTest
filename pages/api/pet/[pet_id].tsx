@@ -24,7 +24,7 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     try {
-      let query = `
+      const query = `
         SELECT pet_name, pettype_id, breed, pet_sex, age, color, weight, about, "image_pet"
         FROM pet
         WHERE pet_id = $1
@@ -57,8 +57,7 @@ export default async function handler(
       breed,
       pet_sex,
       age,
-      color,
-      weight,
+  
       image_pet,
       about,
     } = req.body;
