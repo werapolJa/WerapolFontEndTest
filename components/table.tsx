@@ -55,7 +55,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
 
   const getDatePetById = async () => {
     try {
-      const res = await axios.get(`api/pet/${idDEdit}`);
+      const res = await axios.get(`/api/pet/${idDEdit}`);
       const dataEdit = res.data.data;
       setPetDataEdit(dataEdit);
       setPetnameEdit(dataEdit[0].pet_name);
@@ -424,8 +424,8 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                 alt="close button"
                 className="cursor-pointer"
                 onClick={() => setPopUpDelete(!popUpDelete)}
-                width={100}
-                height={100}
+                width={20}
+                height={20}
               />
             </div>
             {/* Line เส้นกั้น */}
