@@ -24,7 +24,7 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       const result = await connectionPool.query(
-        "select pet_id, pettype_id ,pet_name, breed,pet_sex,age,color,weight,about,create_at,update_at FROM pet"
+        "select pet_id, pettype_id ,pet_name, breed,pet_sex,age,color,weight,about,create_at,update_at FROM pet ORDER BY create_at DESC;"
       );
       const pets = result.rows;
 
@@ -45,20 +45,12 @@ export default async function handler(
       age,
       color,
       weight,
-      image,
+      image_pet,
       about,
     } = req.body;
     console.log(req.body);
     // ตรวจสอบว่ามีข้อมูล
-    if (
-      !pet_name ||
-      !pettype_id ||
-      !breed ||
-      !pet_sex ||
-      !age ||
-      !color ||
-      !weight
-    ) {
+    if (!pet_name) {
       return res
         .status(400)
         .json({ message: "Missing required fields for pet data" });
@@ -73,7 +65,7 @@ export default async function handler(
     try {
       // สร้างตัวแปล เก็บ query เพื่อนำไปใช้
       const petInsertQuery = `
-      insert into pet (pet_name, pettype_id, breed, pet_sex, age, color, weight, image,about)
+      insert into pet (pet_name, pettype_id, breed, pet_sex, age, color, weight, image_pet,about)
       values ($1, $2, $3, $4, $5, $6, $7, $8, $9);
     `;
 
@@ -85,7 +77,7 @@ export default async function handler(
         age,
         color,
         weight,
-        image,
+        image_pet,
         about,
       ]);
 

@@ -5,6 +5,9 @@ import Step1 from "@/components/step1";
 import Step2 from "@/components/step2";
 import Step3 from "@/components/step3";
 
+interface ChangeLanguageType {
+  ChangeLanguage: boolean;
+}
 export default function CreatePet() {
   const [step, setStep] = useState(1);
 
@@ -19,11 +22,12 @@ export default function CreatePet() {
         }
       }
     }
+
     return {
-      name: "",
+      pet_name: "",
       age: "",
       breed: "",
-      imageUrl: "",
+      image_pet: "",
       pettype_id: 0,
       experience: "",
       pet_sex: "",
@@ -31,14 +35,14 @@ export default function CreatePet() {
       weight: "",
       about: "",
       disease: false,
+      ChangeLanguage: true,
     };
   });
-
+  // console.log(formData);
   useEffect(() => {
     // ตรวจสอบการเปลี่ยนแปลงของ formData และอัปเดต localStorage เฉพาะเมื่อมีการเปลี่ยนแปลงจริงๆ
     if (typeof window !== "undefined") {
-      const savedData = localStorage.getItem("formData");
-      if (savedData && savedData !== JSON.stringify(formData)) {
+      if (typeof window !== "undefined") {
         localStorage.setItem("formData", JSON.stringify(formData));
       }
     }
@@ -66,9 +70,36 @@ export default function CreatePet() {
       const url = URL.createObjectURL(file);
       setFormData((prev: FormData) => ({
         ...prev,
-        imageUrl: url,
+        image_pet: url,
       }));
     }
+  };
+
+  const toggleLanguage = () => {
+    setFormData((prev: ChangeLanguageType) => ({
+      ...prev,
+      ChangeLanguage: !prev.ChangeLanguage, // สลับค่าระหว่าง true และ false
+    }));
+  };
+
+  const resetFormData = () => {
+    setFormData({
+      pet_name: "",
+      age: "",
+      breed: "",
+      image_pet: "",
+      pettype_id: 0,
+      experience: "",
+      pet_sex: "",
+      color: "",
+      weight: "",
+      about: "",
+      disease: false,
+      ChangeLanguage: true,
+    });
+
+    // Also clear the form data from localStorage
+    localStorage.removeItem("formData");
   };
 
   const renderStep = () => {
@@ -80,6 +111,7 @@ export default function CreatePet() {
             handleChange={handleChange}
             nextStep={nextStep}
             handleImageUpload={handleImageUpload}
+            toggleLanguage={toggleLanguage}
           />
         );
       case 2:
@@ -89,6 +121,7 @@ export default function CreatePet() {
             handleChange={handleChange}
             nextStep={nextStep}
             prevStep={prevStep}
+            toggleLanguage={toggleLanguage}
           />
         );
       case 3:
@@ -97,6 +130,8 @@ export default function CreatePet() {
             formData={formData}
             handleChange={handleChange}
             prevStep={prevStep}
+            resetFormData={resetFormData}
+            toggleLanguage={toggleLanguage}
           />
         );
       default:
