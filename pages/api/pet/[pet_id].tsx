@@ -57,7 +57,7 @@ export default async function handler(
       breed,
       pet_sex,
       age,
-  
+
       image_pet,
       about,
     } = req.body;
@@ -69,15 +69,7 @@ export default async function handler(
     }
 
     // Validate required fields
-    if (
-      !pet_name ||
-      !pettype_id ||
-      !breed ||
-      !pet_sex ||
-      !age ||
-
-      !about
-    ) {
+    if (!pet_name || !pettype_id || !breed || !pet_sex || !age || !about) {
       return res
         .status(400)
         .json({ message: "Missing required fields for pet data" });
@@ -98,7 +90,7 @@ export default async function handler(
       // Update the pet information
       const petUpdateQuery = `
         UPDATE pet
-        SET pet_name = $1, pettype_id = $2, breed = $3, pet_sex = $4, age = $5,  "image_pet" = $6, about = $7
+        SET pet_name = $1, pettype_id = $2, breed = $3, pet_sex = $4, age = $5,  image_pet = $6, about = $7
         WHERE pet_id = $8
         RETURNING *;
       `;

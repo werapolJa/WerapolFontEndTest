@@ -4,17 +4,17 @@ import { useRouter } from "next/router";
 import ImagePetDefauit from "@/public/assets/petimage.svg";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/context/toggleLanguage";
 
 interface Step1Props {
   formData: {
     pet_name: string;
     image_pet: string;
-    ChangeLanguage: boolean;
   };
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   nextStep: () => void;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  toggleLanguage: () => void; // อัปเดต: ไม่รับพารามิเตอร์
+  toggleLanguage: () => void;
 }
 
 export default function Step1({
@@ -22,17 +22,16 @@ export default function Step1({
   handleChange,
   nextStep,
   handleImageUpload,
-  toggleLanguage,
 }: Step1Props) {
   const router = useRouter();
   const [errorName, setErrorName] = useState<string>("");
   const [errorNameEn, setErrorNameEn] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false); // เพิ่ม useState เพื่อให้แน่ใจว่าเราไม่เจอ hydration error
+  const { ChangeLanguage, toggleLanguage } = useLanguage();
 
   useEffect(() => {
     setIsMounted(true); // ตั้งค่าสถานะให้เป็น true เมื่อ component ถูก mount
   }, []);
-  console.log(formData);
 
   useEffect(() => {
     // ทำให้ React รู้ว่าเป็นไคลเอ็นต์
@@ -50,7 +49,7 @@ export default function Step1({
     nextStep();
   };
   if (!isMounted) return null;
-  console.log(formData.ChangeLanguage);
+  // console.log(formData.ChangeLanguage);
 
   return (
     <div className=" bg-white ">
@@ -62,11 +61,11 @@ export default function Step1({
             className="bg-[#FF5C00] p-2 rounded-full hidden text-white absolute top-32 md:inline cursor-pointer"
             onClick={() => toggleLanguage()}
           >
-            {formData.ChangeLanguage === true ? "EN" : "TH"}
+            {ChangeLanguage === true ? "EN" : "TH"}
           </div>
         </div>
       </div>
-      {formData.ChangeLanguage ? (
+      {ChangeLanguage ? (
         <div className="flex items-center justify-center mb-12">
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
@@ -115,7 +114,7 @@ export default function Step1({
       )}
 
       {/* Main content */}
-      {formData.ChangeLanguage ? (
+      {ChangeLanguage ? (
         <div className="max-w-96 mx-auto h-auto ">
           <div className="grid grid-cols-1 ">
             <div className="aspect-square bg-[#FFF5F2] rounded-xl flex flex-col items-center justify-center gap-4 transition-colors py-10">
@@ -307,7 +306,7 @@ export default function Step1({
           </div>
 
           {/* Navigation buttons */}
-          {formData.ChangeLanguage ? (
+          {ChangeLanguage ? (
             <div className="flex justify-between mt-12">
               <button
                 className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] transition-colors"

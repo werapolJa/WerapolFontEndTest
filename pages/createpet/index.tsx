@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Step1 from "@/components/step1";
 import Step2 from "@/components/step2";
 import Step3 from "@/components/step3";
+import { useLanguage } from "@/context/toggleLanguage";
 
-interface ChangeLanguageType {
-  ChangeLanguage: boolean;
-}
 export default function CreatePet() {
   const [step, setStep] = useState(1);
+  const { ChangeLanguage, toggleLanguage } = useLanguage();
+  // ดึงค่าจาก localStorage เมื่อเริ่มต้น (ถ้ามี)
+  console.log(ChangeLanguage);
 
   const [formData, setFormData] = useState(() => {
     if (typeof window !== "undefined") {
@@ -38,15 +39,44 @@ export default function CreatePet() {
       ChangeLanguage: true,
     };
   });
-  // console.log(formData);
-  useEffect(() => {
-    // ตรวจสอบการเปลี่ยนแปลงของ formData และอัปเดต localStorage เฉพาะเมื่อมีการเปลี่ยนแปลงจริงๆ
+
+  // ฟังก์ชันบันทึกข้อมูลเข้า localStorage (เรียกใช้ตอนกด Save)
+  const getDataSize = (data: any) => {
+    return new TextEncoder().encode(JSON.stringify(data)).length; // คำนวณขนาดข้อมูลที่จะแปลงเป็นสตริง
+  };
+  const saveToLocalStorage = () => {
     if (typeof window !== "undefined") {
-      if (typeof window !== "undefined") {
+      const dataSize = getDataSize(formData);
+      const maxSize = 5 * 1024 * 1024; // ขีดจำกัดของ localStorage (5MB)
+
+      if (dataSize > maxSize) {
+        console.error("Data size exceeds localStorage quota");
+        alert("ข้อมูลเกินขีดจำกัดที่กำหนดใน Local Storage");
+
+        // ลองบีบอัดข้อมูลหรือเก็บแค่ข้อมูลที่จำเป็น
+        // ตัวอย่าง: ลบข้อมูลที่ไม่จำเป็น เช่น ภาพ หรือข้อมูลขนาดใหญ่
+        const reducedData = { ...formData, image_pet: "" }; // ลบข้อมูลภาพก่อนบันทึก
+        localStorage.setItem("formData", JSON.stringify(reducedData));
+        return;
+      }
+
+      try {
         localStorage.setItem("formData", JSON.stringify(formData));
+      } catch (error) {
+        if (
+          error instanceof DOMException &&
+          error.name === "QuotaExceededError"
+        ) {
+          console.error(
+            "QuotaExceededError: Failed to save data to localStorage"
+          );
+          alert(
+            "ไม่สามารถบันทึกข้อมูลได้ เนื่องจากพื้นที่ใน Local Storage เต็ม"
+          );
+        }
       }
     }
-  }, [formData]); // จะอัปเดต localStorage เฉพาะเมื่อ formData เปลี่ยนแปลง
+  };
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
@@ -57,7 +87,7 @@ export default function CreatePet() {
     >
   ) => {
     const { name, value, type } = e.target;
-    setFormData((prev: FormData) => ({
+    setFormData((prev: any) => ({
       ...prev,
       [name]:
         type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
@@ -66,20 +96,19 @@ export default function CreatePet() {
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setFormData((prev: FormData) => ({
-        ...prev,
-        image_pet: url,
-      }));
-    }
-  };
 
-  const toggleLanguage = () => {
-    setFormData((prev: ChangeLanguageType) => ({
-      ...prev,
-      ChangeLanguage: !prev.ChangeLanguage, // สลับค่าระหว่าง true และ false
-    }));
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setFormData((prev: any) => ({
+          ...prev,
+          image_pet: base64String,
+        }));
+      };
+    }
   };
 
   const resetFormData = () => {
@@ -95,10 +124,8 @@ export default function CreatePet() {
       weight: "",
       about: "",
       disease: false,
-      ChangeLanguage: true,
     });
 
-    // Also clear the form data from localStorage
     localStorage.removeItem("formData");
   };
 
@@ -111,7 +138,7 @@ export default function CreatePet() {
             handleChange={handleChange}
             nextStep={nextStep}
             handleImageUpload={handleImageUpload}
-            toggleLanguage={toggleLanguage}
+            toggleLanguage={toggleLanguage} // ใช้ toggleLanguage จาก context
           />
         );
       case 2:
@@ -121,7 +148,7 @@ export default function CreatePet() {
             handleChange={handleChange}
             nextStep={nextStep}
             prevStep={prevStep}
-            toggleLanguage={toggleLanguage}
+            toggleLanguage={toggleLanguage} // ใช้ toggleLanguage จาก context
           />
         );
       case 3:
@@ -131,7 +158,8 @@ export default function CreatePet() {
             handleChange={handleChange}
             prevStep={prevStep}
             resetFormData={resetFormData}
-            toggleLanguage={toggleLanguage}
+            saveToLocalStorage={saveToLocalStorage} // เพิ่มปุ่มบันทึก
+            toggleLanguage={toggleLanguage} // ใช้ toggleLanguage จาก context
           />
         );
       default:
@@ -140,11 +168,11 @@ export default function CreatePet() {
   };
 
   return (
-    <div className="">
-      <div className="bg-base-100 p-8 rounded-lg w-full mt-20">
-        <h1 className="text-2xl font-bold mb-6 text-center">Create Pet test Vercel</h1>
-        {renderStep()}
-      </div>
+    <div className="bg-base-100 p-8 rounded-lg w-full mt-20">
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Create Pet test Vercel
+      </h1>
+      {renderStep()}
     </div>
   );
 }

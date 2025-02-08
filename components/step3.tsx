@@ -6,6 +6,8 @@ import Image from "next/image";
 import ImagePetDefauit from "@/public/assets/petimage.svg";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { useLanguage } from "@/context/toggleLanguage";
+
 interface Step3Props {
   formData: {
     pet_name: string;
@@ -16,7 +18,6 @@ interface Step3Props {
     pet_sex: string;
     about: string;
     disease: boolean;
-    ChangeLanguage: boolean;
   };
   handleChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -26,6 +27,7 @@ interface Step3Props {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
   toggleLanguage: () => void;
+  saveToLocalStorage: () => void;
 }
 
 export default function Step3({
@@ -33,7 +35,7 @@ export default function Step3({
   handleChange,
   prevStep,
   resetFormData,
-  toggleLanguage,
+  saveToLocalStorage,
 }: Step3Props) {
   useEffect(() => {
     if (formData.about !== "") {
@@ -44,7 +46,11 @@ export default function Step3({
   const [errorAboutEn, setErrorAboutEn] = useState<string>("");
   const [popUp, setPopUp] = useState<boolean>(false);
   const router = useRouter();
-  // console.log(formData);
+  const { ChangeLanguage, toggleLanguage } = useLanguage();
+
+  const [image, setImage] = useState<string | null>(null);
+  console.log(image);
+
   const handleChangeCheckPage = (e: React.FormEvent) => {
     e.preventDefault();
     let isValid = true;
@@ -55,25 +61,55 @@ export default function Step3({
     }
     if (isValid) {
       setPopUp(!popUp);
-      // console.log(isValid);
     }
   };
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await axios.post(`/api/pet`, formData);
 
-      // Pass an empty event to resetFormData
+  const handleAddImage = async () => {
+    if (!formData.image_pet) {
+      alert("No image selected.");
+      return;
+    }
+
+    try {
+      const response = await fetch(formData.image_pet);
+      const blob = await response.blob();
+      const file = new File([blob], "pet_image.jpg", { type: blob.type });
+
+      const uploadFormData = new FormData();
+      uploadFormData.append("image", file);
+
+      const uploadResponse = await axios.post(
+        "/api/pet/uploadyoupet",
+        uploadFormData
+      );
+      setImage(uploadResponse.data.urls[0]);
+
+      const dataCreate = {
+        pet_name: formData.pet_name,
+        image_pet: uploadResponse.data.urls[0],
+        age: formData.age,
+        breed: formData.breed,
+        pettype_id: formData.pettype_id,
+        pet_sex: formData.pet_sex,
+        about: formData.about,
+        disease: formData.disease,
+        color: "",
+        weight: "",
+      };
+
+      // console.log(dataCreate);
+      console.log(dataCreate);
+      
+      await axios.post(`/api/pet`, dataCreate);
       resetFormData({} as React.ChangeEvent<HTMLInputElement>);
       router.push("/");
-    } catch (error) {
-      console.error("Error submitting form:", error);
+    } catch (err) {
+      console.log("Error uploading image:", err);
     }
   };
 
   return (
     <>
-      {" "}
       <div>
         <div className="bg-white ">
           <div className="max-w-xl mx-auto ">
@@ -82,12 +118,12 @@ export default function Step3({
                 className="bg-[#FF5C00] p-2 rounded-full hidden text-white absolute top-32 md:inline cursor-pointer"
                 onClick={() => toggleLanguage()}
               >
-                {formData.ChangeLanguage === true ? "EN" : "TH"}
+                {ChangeLanguage === true ? "EN" : "TH"}
               </div>
             </div>
           </div>
           <div className="flex items-center justify-center mb-12">
-            {formData.ChangeLanguage ? (
+            {ChangeLanguage ? (
               <div className="flex items-center space-x-4">
                 <div className="flex items-center">
                   <div className="bg-black text-white rounded-full w-8 h-8 flex items-center justify-center">
@@ -134,7 +170,7 @@ export default function Step3({
 
           {/* Main content */}
           <div className="max-w-96 mx-auto">
-            {formData.ChangeLanguage ? (
+            {ChangeLanguage ? (
               <div className="grid grid-cols-1">
                 <div className="aspect-square bg-[#FFF5F2] rounded-xl flex flex-col items-center justify-center gap-4 transition-colors py-10">
                   {errorAbout ? (
@@ -215,7 +251,7 @@ export default function Step3({
                 className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] hover:bg-[#FFE8E0] transition-colors"
                 onClick={prevStep}
               >
-                {formData.ChangeLanguage ? "Back" : "กลับ"}
+                {ChangeLanguage ? "Back" : "กลับ"}
               </button>
               <button
                 onClick={handleChangeCheckPage}
@@ -225,7 +261,7 @@ export default function Step3({
                     : "px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] "
                 }`}
               >
-                {formData.ChangeLanguage ? "Show Detail" : "ดูรายละเอียด"}
+                {ChangeLanguage ? "Show Detail" : "ดูรายละเอียด"}
               </button>
             </div>
           </div>
@@ -238,7 +274,7 @@ export default function Step3({
             <div className="flex justify-between items-center py-6 mx-4 md:mx-10 sticky top-0 bg-white z-10">
               <h2 className="text-2xl font-bold">Pet Detail</h2>
               <Image
-                src={CloseIcon}
+                src={CloseIcon || "/placeholder.svg"}
                 alt="close button"
                 className="cursor-pointer"
                 onClick={() => setPopUp(!popUp)}
@@ -360,11 +396,14 @@ export default function Step3({
             <div className="flex justify-center items-center  mx-4 md:mx-10 my-5">
               <h1
                 className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00]  cursor-pointer"
-                onClick={handleSubmit}
+                onClick={handleAddImage}
               >
                 Confime
               </h1>
             </div>
+            <button onClick={saveToLocalStorage} className="btn btn-primary">
+              บันทึกข้อมูล
+            </button>
           </div>
         </div>
       )}

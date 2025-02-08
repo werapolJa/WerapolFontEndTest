@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/context/toggleLanguage";
 import type React from "react";
 import { useEffect, useState } from "react";
 
@@ -8,7 +9,6 @@ interface Step2Props {
     breed: string;
     pettype_id: number;
     pet_sex: string;
-    ChangeLanguage: boolean;
   };
   handleChange: (
     e: React.ChangeEvent<
@@ -25,7 +25,6 @@ export default function Step2({
   handleChange,
   nextStep,
   prevStep,
-  toggleLanguage,
 }: Step2Props) {
   useEffect(() => {
     if (formData.age !== "") {
@@ -49,8 +48,8 @@ export default function Step2({
   const [errorTypeEn, setErrorTypeEn] = useState<string>("");
   const [errorSex, setErrorSex] = useState<string>("");
   const [errorSexEn, setErrorSexEn] = useState<string>("");
-
-  console.log(formData);
+  const { ChangeLanguage, toggleLanguage } = useLanguage();
+  // console.log(formData);
   const handleChangeCheckPage = () => {
     let isValid = true;
     if (formData.age === "") {
@@ -86,12 +85,12 @@ export default function Step2({
             className="bg-[#FF5C00] p-2 rounded-full hidden text-white absolute top-32 md:inline cursor-pointer"
             onClick={() => toggleLanguage()}
           >
-            {formData.ChangeLanguage === true ? "EN" : "TH"}
+            {ChangeLanguage === true ? "EN" : "TH"}
           </div>
         </div>
       </div>
       <div className="flex items-center justify-center">
-        {formData.ChangeLanguage ? (
+        {ChangeLanguage ? (
           <div className="flex items-center justify-center mb-12">
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
@@ -143,7 +142,7 @@ export default function Step2({
       {/* Main content */}
       <div className="max-w-96 mx-auto">
         {/* Create New Pet Card */}
-        {formData.ChangeLanguage ? (
+        {ChangeLanguage ? (
           <div className="grid grid-cols-1">
             <div className="aspect-square bg-[#FFF5F2] rounded-xl flex flex-col items-center justify-center gap-4 transition-colors py-10">
               <div className="flex flex-col w-[80%] gap-2">
@@ -341,7 +340,7 @@ export default function Step2({
           </div>
         )}
         {/* Navigation buttons */},
-        {formData.ChangeLanguage ? (
+        {ChangeLanguage ? (
           <div className="flex justify-between mt-12">
             <button
               className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] hover:bg-[#FFE8E0] transition-colors"

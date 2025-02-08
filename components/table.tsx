@@ -2,6 +2,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import CloseIcon from "@/public/assets/close-icon.svg";
 import axios from "axios";
+import ImagePetDefauit from "@/public/assets/petimage.svg";
 type Pet = {
   pet_id: number;
   pettype_id: number;
@@ -16,7 +17,7 @@ type Pet = {
   about?: string;
   create_at: string;
   update_at: string;
-  ChangeLanguage: boolean;
+  image_pet: string;
 };
 interface DataTableProps {
   data: Pet[];
@@ -45,7 +46,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   // console.log(petageEdit);
   // console.log(petAboutEdit);
   // console.log(petTypeEdit);
-  // console.log(petsSxEdit);
+  console.log(petDataEdit);
 
   useEffect(() => {
     if (idDEdit !== 0) {
@@ -184,58 +185,64 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   };
   return (
     <div className="min-w-80 md:w-full">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-gray-200 bg-gray-50">
-            <th className="px-4 py-3 text-left font-medium text-gray-500">
-              Name
-            </th>
-            <th className="px-4 py-3 text-left font-medium text-gray-500">
-              Breed
-            </th>
-            <th className="px-4 py-3 text-left font-medium text-gray-500">
-              Created
-            </th>
-            <th className="px-4 py-3 text-right font-medium text-gray-500">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="min-w-80 md:w-full">
-          {data.map((item) => (
-            <tr
-              key={item.pet_id}
-              className="border-b border-gray-200 last:border-0 min-w-80 md:w-full "
-            >
-              <td className="px-4 py-3 w-64">{item.pet_name}</td>
-              <td className="px-4 py-3">{item.breed}</td>
-              <td className="px-4 py-3">
-                {new Date(item.create_at).toLocaleDateString()}
-              </td>
-              <td className="px-4 py-3 flex justify-end gap-2 w-full">
-                <button
-                  className="h-8 w-8 border border-gray-200 rounded-md hover:bg-gray-50"
-                  onClick={() => {
-                    setPopUpEdit(!popUpEdit);
-                    setIdDEdit(item.pet_id);
-                  }}
-                >
-                  ✏️
-                </button>
-                <button
-                  className="h-8 w-8 border border-gray-200 rounded-md hover:bg-gray-50"
-                  onClick={() => {
-                    setPopUpDelete(!popUpDelete);
-                    setIdDelete(item.pet_id);
-                  }}
-                >
-                  ❌
-                </button>
-              </td>
+      {data.length !== 0 ? (
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-gray-200 bg-gray-50">
+              <th className="px-4 py-3 text-left font-medium text-gray-500">
+                Name
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">
+                Breed
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">
+                Created
+              </th>
+              <th className="px-4 py-3 text-right font-medium text-gray-500">
+                Actions
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="min-w-80 md:w-full">
+            {data.map((item) => (
+              <tr
+                key={item.pet_id}
+                className="border-b border-gray-200 last:border-0 min-w-80 md:w-full "
+              >
+                <td className="px-4 py-3 w-64">{item.pet_name}</td>
+                <td className="px-4 py-3">{item.breed}</td>
+                <td className="px-4 py-3">
+                  {new Date(item.create_at).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-3 flex justify-end gap-2 w-full">
+                  <button
+                    className="h-8 w-8 border border-gray-200 rounded-md hover:bg-gray-50"
+                    onClick={() => {
+                      setPopUpEdit(!popUpEdit);
+                      setIdDEdit(item.pet_id);
+                    }}
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    className="h-8 w-8 border border-gray-200 rounded-md hover:bg-gray-50"
+                    onClick={() => {
+                      setPopUpDelete(!popUpDelete);
+                      setIdDelete(item.pet_id);
+                    }}
+                  >
+                    ❌
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className="w-full  h-[680px] flex justify-center items-center">
+          ไม่มีข้อมูล
+        </div>
+      )}
 
       {popUpEdit && (
         <div className="  fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center md:p-4  ">
@@ -252,11 +259,29 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
             {/* Line เส้นกั้น */}
             <hr className="mb-10" />
             {/* image  */}
-            <div className="flex flex-col items-center gap-4 ">
-              <div className="relative">
-                <div className="avatar">
-                  <div className="w-32 h-32 rounded-full bg-base-200 ring ring-[#FF5C00] ring-offset-base-100 ring-offset-2 "></div>
-                </div>
+            <div className="flex justify-center items-center">
+              <div className="w-32 h-32 rounded-full bg-base-200 ring ring-[#FF5C00] ring-offset-base-100 ring-offset-2 ">
+                {petDataEdit[0]?.image_pet ? (
+                  <img
+                    src={petDataEdit[0]?.image_pet || ImagePetDefauit} // ใช้ path ที่สัมพันธ์กับ public
+                    alt="Avatar"
+                    className="w-full h-full object-cover rounded-full"
+                    width={100} // กำหนดขนาดให้เหมาะสม
+                    height={100} // กำหนดขนาดให้เหมาะสม
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full">
+                    <div className="w-[80%] h-auto flex items-center justify-center">
+                      <Image
+                        src="/assets/petimage.svg" // ใช้ path ที่สัมพันธ์กับ public
+                        alt="petimage"
+                        width={100} // กำหนดขนาดให้เหมาะสม
+                        height={100} // กำหนดขนาดให้เหมาะสม
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             {/* Name and Age */}
