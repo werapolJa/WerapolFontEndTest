@@ -31,7 +31,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   const { ChangeLanguage } = useLanguage();
   const [popUpEdit, setPopUpEdit] = useState<boolean>(false);
   const [popUpDelete, setPopUpDelete] = useState<boolean>(false);
-  const [idDelete, setIdDelete] = useState<number>(0);
+  // const [idDelete, setIdDelete] = useState<number>(0);
   const [idDEdit, setIdDEdit] = useState<number>(0);
   const [petDataEdit, setPetDataEdit] = useState<Pet[]>([]);
   const [petnameEdit, setPetnameEdit] = useState<string>("");
@@ -55,7 +55,9 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   const [loadingEditData, setLoadingEditData] = useState<boolean>(true);
   const [disease, setDisease] = useState<boolean>(true);
   const [imageCheckType, setImageCheckType] = useState<boolean>(true);
-  console.log(imageCheckType);
+  const [imageDelete, setImageDelete] = useState<string>("");
+
+  // console.log(imageDelete);
 
   useEffect(() => {
     if (idDEdit !== 0) {
@@ -306,8 +308,14 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
     }
   };
   const handleDelete = async () => {
+    console.log(imageDelete);
+
     try {
-      await axios.delete(`api/pet/${idDelete}`);
+    
+      await axios.delete("/api/deletetableimage", {
+        data: { url: imageDelete },
+      });
+
       setPopUpDelete(false);
       window.location.reload();
     } catch (error) {
@@ -359,7 +367,8 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                     className="h-8 w-8 border border-gray-200 rounded-md hover:bg-gray-50"
                     onClick={() => {
                       setPopUpDelete(!popUpDelete);
-                      setIdDelete(item.pet_id);
+                      setImageDelete(item?.image_pet);
+                      // setIdDelete(item.pet_id);
                     }}
                   >
                     ❌
@@ -679,7 +688,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                           onClick={handleEditPet}
                           className={`cursor-pointer bg-[#FF5C00] text-white px-3 rounded-lg py-2`}
                         >
-                         {ChangeLanguage ? " Confime Edit":"ยืนยันการแก้ไข"}
+                          {ChangeLanguage ? " Confime Edit" : "ยืนยันการแก้ไข"}
                         </h1>
                       </div>
                     ) : (
@@ -687,7 +696,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                         <h1
                           className={`px-3 py-2 rounded-lg bg-gray-200 text-gray-400 cursor-not-allowed`}
                         >
-                         {ChangeLanguage ? "Loading . . .":"กำลังโหลด . . ."}
+                          {ChangeLanguage ? "Loading . . ." : "กำลังโหลด . . ."}
                         </h1>
                       </div>
                     )}

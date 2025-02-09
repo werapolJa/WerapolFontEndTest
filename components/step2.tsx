@@ -375,7 +375,7 @@ export default function Step2({
             </div>
           </div>
         )}
-        {/* Navigation buttons */},
+        {/* Navigation buttons */}
         {ChangeLanguage ? (
           <div className="flex justify-between mt-12">
             <button

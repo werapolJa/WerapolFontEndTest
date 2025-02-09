@@ -49,7 +49,7 @@ export default function Step3({
   const [popUp, setPopUp] = useState<boolean>(false);
   const router = useRouter();
   const { ChangeLanguage, toggleLanguage } = useLanguage();
-  const [image, setImage] = useState<string | null>(null);
+
   const [loadingBtCreate, setLoadingBtCreate] = useState<boolean>(true);
   // console.log(popUpsaveStoreage);
 
@@ -82,7 +82,6 @@ export default function Step3({
         "/api/pet/uploadyoupet",
         uploadFormData
       );
-      setImage(uploadResponse.data.urls[0]);
 
       const dataCreate = {
         pet_name: formData.pet_name,
@@ -320,10 +319,12 @@ export default function Step3({
                 <div className="avatar">
                   <div className="w-32 h-32 rounded-full bg-base-200 ring ring-[#FF5C00] ring-offset-base-100 ring-offset-2 ">
                     {formData.image_pet ? (
-                      <img
+                      <Image
                         src={formData.image_pet || ImagePetDefauit}
                         alt="Avatar"
                         className="w-full h-full object-cover"
+                        width={100}
+                        height={100}
                       />
                     ) : (
                       <div className="flex items-center justify-center w-full h-full">
@@ -342,7 +343,7 @@ export default function Step3({
                 </div>
               </div>
               {!formData.image_pet && (
-                <div className="text-red-600">ยังไม่ได้เพิ่มรูปภาพ</div>
+                <div className="text-red-600">{ChangeLanguage ?"No photos added":"ยังไม่ได้เพิ่มรูปภาพ"}</div>
               )}
             </div>
             {/* Name and Age */}
@@ -461,8 +462,7 @@ export default function Step3({
             ) : (
               <div className="flex justify-center items-center  mx-4 md:mx-10 my-5">
                 <h1 className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] border border-[#FF5C00]   cursor-not-allowed">
-                {ChangeLanguage ? "Loading . . ." : "กำลังโหลด . . ."}
-                
+                  {ChangeLanguage ? "Loading . . ." : "กำลังโหลด . . ."}
                 </h1>
               </div>
             )}
@@ -481,7 +481,9 @@ export default function Step3({
                 src={CloseIcon || "/placeholder.svg"}
                 alt="close button"
                 className="cursor-pointer"
-                onClick={() => setPopUpsaveStoreage(!popUpsaveStoreage)}
+                onClick={() => {
+                  setPopUpsaveStoreage(!popUpsaveStoreage);
+                }}
                 width={20}
                 height={20}
               />

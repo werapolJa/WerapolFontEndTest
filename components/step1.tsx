@@ -123,10 +123,12 @@ export default function Step1({
                   <div className="avatar">
                     <div className="w-32 h-32 rounded-full bg-base-200 ring ring-[#FF5C00] ring-offset-base-100 ring-offset-2 ">
                       {formData.image_pet ? (
-                        <img
+                        <Image
                           src={formData.image_pet || ImagePetDefauit} // ใช้ path ที่สัมพันธ์กับ public
                           alt="Avatar"
                           className="w-full h-full object-cover"
+                          width={100} // กำหนดขนาดให้เหมาะสม
+                          height={100} // กำหนดขนาดให้เหมาะสม
                         />
                       ) : (
                         <div className="flex items-center justify-center w-full h-full">
@@ -228,10 +230,12 @@ export default function Step1({
                   <div className="avatar">
                     <div className="w-32 h-32 rounded-full bg-base-200 ring ring-[#FF5C00] ring-offset-base-100 ring-offset-2 ">
                       {formData.image_pet ? (
-                        <img
+                        <Image
                           src={formData.image_pet || ImagePetDefauit} // ใช้ path ที่สัมพันธ์กับ public
                           alt="Avatar"
                           className="w-full h-full object-cover"
+                          width={100} // กำหนดขนาดให้เหมาะสม
+                          height={100} // กำหนดขนาดให้เหมาะสม
                         />
                       ) : (
                         <div className="flex items-center justify-center w-full h-full">

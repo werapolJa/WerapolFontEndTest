@@ -1,16 +1,35 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Table from "@/components/table"; // นำเข้า Table
-import Pagination from "@/components/renderPaginationButtons"; // นำเข้า Pagination
+import Table from "@/components/table"; // Import Table
+import Pagination from "@/components/renderPaginationButtons"; // Import Pagination
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { useLanguage } from "@/context/toggleLanguage"; // นำเข้า context
+import { useLanguage } from "@/context/toggleLanguage"; // Import context
+
+// Define the Pet interface
+type Pet = {
+  pet_id: number;
+  pettype_id: number;
+  image: string;
+  pet_name: string;
+  experience: "0-2" | "3-5" | "5+";
+  breed: string;
+  pet_sex: "M" | "F";
+  age: number;
+  color: string;
+  weight: number;
+  about?: string;
+  create_at: string;
+  update_at: string;
+  image_pet: string;
+  disease: boolean | undefined;
+};
 
 const App: React.FC = () => {
   const router = useRouter();
-  const { ChangeLanguage, toggleLanguage } = useLanguage(); // ใช้ context จาก LanguageContext
-  const [pet, setPet] = useState<any[]>([]);
+  const { ChangeLanguage, toggleLanguage } = useLanguage(); // Use context from LanguageContext
+  const [pet, setPet] = useState<Pet[]>([]); // Use Pet[] type instead of any[]
 
   const rowsPerPage = 8;
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -18,7 +37,6 @@ const App: React.FC = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentData = pet.slice(indexOfFirstRow, indexOfLastRow);
-  // console.log(currentData);
 
   useEffect(() => {
     DataPet();
@@ -27,7 +45,7 @@ const App: React.FC = () => {
   const DataPet = async () => {
     try {
       const res = await axios.get("/api/pet");
-      setPet(res.data);
+      setPet(res.data); // Ensure the response data matches the Pet type
     } catch (error) {
       console.log(error);
     }
@@ -53,12 +71,12 @@ const App: React.FC = () => {
         </button>
         <button
           className="btn btn-outline btn-secondary"
-          onClick={toggleLanguage} // เรียกใช้ toggleLanguage จาก context
+          onClick={toggleLanguage} // Call toggleLanguage from context
         >
           {ChangeLanguage ? "EN" : "TH"}
         </button>
       </div>
-      {/* table */}
+      {/* Table */}
       <Table data={currentData} />
       {/* Pagination */}
       {currentData.length !== 0 && (

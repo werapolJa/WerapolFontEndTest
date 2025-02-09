@@ -24,7 +24,7 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       const result = await connectionPool.query(
-        "select pet_id, pettype_id ,pet_name, breed,pet_sex,age,color,weight,about,create_at,update_at FROM pet ORDER BY create_at DESC;"
+        "select pet_id, pettype_id ,pet_name, breed,pet_sex,age,color,weight,about,create_at,update_at, image_pet FROM pet ORDER BY create_at DESC;"
       );
       const pets = result.rows;
 

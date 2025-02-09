@@ -8,10 +8,22 @@ import { useLanguage } from "@/context/toggleLanguage";
 import Image from "next/image";
 import CloseIcon from "@/public/assets/close-icon.svg";
 
+interface FormData {
+  pet_name: string;
+  pet_sex: string;
+  age: number;
+  breed: string;
+  image_pet?: string; // Optional field
+  disease?: boolean; // Optional field
+  [key: string]: string | number | boolean | undefined; // Allow string, number, boolean, or undefined for other fields
+}
+
 export default function CreatePet() {
   const [step, setStep] = useState(1);
   const { ChangeLanguage, toggleLanguage } = useLanguage();
   const [imageCheckType, setImageCheckType] = useState<boolean>(true);
+  const [popUpImageOverLoad, setPopUpImageOverLoad] = useState<boolean>(true);
+
   // ดึงค่าจาก localStorage เมื่อเริ่มต้น (ถ้ามี)
   console.log(imageCheckType);
 
@@ -44,9 +56,10 @@ export default function CreatePet() {
   });
 
   // ฟังก์ชันบันทึกข้อมูลเข้า localStorage (เรียกใช้ตอนกด Save)
-  const getDataSize = (data: any) => {
-    return new TextEncoder().encode(JSON.stringify(data)).length; // คำนวณขนาดข้อมูลที่จะแปลงเป็นสตริง
+  const getDataSize = (data: object) => {
+    return new TextEncoder().encode(JSON.stringify(data)).length; // Calculate the size of the data after converting it to a string
   };
+
   const saveToLocalStorage = () => {
     if (typeof window !== "undefined") {
       const dataSize = getDataSize(formData);
@@ -54,7 +67,7 @@ export default function CreatePet() {
 
       if (dataSize > maxSize) {
         console.error("Data size exceeds localStorage quota");
-        alert("ข้อมูลเกินขีดจำกัดที่กำหนดใน Local Storage");
+        setPopUpImageOverLoad(false);
 
         // ลองบีบอัดข้อมูลหรือเก็บแค่ข้อมูลที่จำเป็น
         // ตัวอย่าง: ลบข้อมูลที่ไม่จำเป็น เช่น ภาพ หรือข้อมูลขนาดใหญ่
@@ -62,7 +75,6 @@ export default function CreatePet() {
         localStorage.setItem("formData", JSON.stringify(reducedData));
         return;
       }
-
       try {
         localStorage.setItem("formData", JSON.stringify(formData));
       } catch (error) {
@@ -90,7 +102,8 @@ export default function CreatePet() {
     >
   ) => {
     const { name, value, type } = e.target;
-    setFormData((prev: any) => ({
+
+    setFormData((prev: FormData) => ({
       ...prev,
       [name]:
         type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
@@ -114,7 +127,7 @@ export default function CreatePet() {
 
       reader.onloadend = () => {
         const base64String = reader.result as string;
-        setFormData((prev: any) => ({
+        setFormData((prev: FormData) => ({
           ...prev,
           image_pet: base64String,
         }));
@@ -205,6 +218,31 @@ export default function CreatePet() {
               {ChangeLanguage
                 ? "Please select a valid image file (JPG, PNG)."
                 : "ไฟล์รูปภาพที่ถูกต้อง (เช่น JPG, PNG)."}
+            </div>
+          </div>
+        </div>
+      )}
+      {!popUpImageOverLoad && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center md:p-4">
+          <div className="absolute bg-white bottom-0 shadow-xl w-full h-[80%] md:top-1/2 md:left-1/2 md:transform md:-translate-x-1/2 md:-translate-y-1/2 md:w-[500px] md:h-[300px] md:rounded-3xl">
+            <div className="flex justify-between items-center py-6 mx-4 md:mx-10">
+              <h2 className="text-2xl font-bold text-red-500">
+                {ChangeLanguage ? "warning" : "คำเตือน"}
+              </h2>
+            </div>
+            {/* Line เส้นกั้น */}
+            <div className="flex justify-center items-center mt-10 text-xl">
+              {ChangeLanguage
+                ? "The image is too large to be stored."
+                : "รูปมีขนาดใหญ่เกินไป ไม่สามารถจัดเก็บได้"}
+            </div>
+            <div className="flex items-center justify-center mt-10">
+              <button
+                onClick={() => setPopUpImageOverLoad(!popUpImageOverLoad)}
+                className="px-10 py-2 bg-red-500 rounded-lg text-white"
+              >
+                {ChangeLanguage ? "confirm" : "ยืนยัน"}
+              </button>
             </div>
           </div>
         </div>
