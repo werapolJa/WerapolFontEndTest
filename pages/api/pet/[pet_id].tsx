@@ -101,7 +101,6 @@ export default async function handler(
         breed,
         pet_sex,
         age,
-
         image_pet,
         about,
         pet_id,

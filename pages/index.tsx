@@ -18,7 +18,7 @@ const App: React.FC = () => {
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
   const currentData = pet.slice(indexOfFirstRow, indexOfLastRow);
-  console.log(currentData);
+  // console.log(currentData);
 
   useEffect(() => {
     DataPet();
@@ -40,7 +40,7 @@ const App: React.FC = () => {
   return (
     <div className="min-w-80 mx-2 lg:max-w-6xl lg:mx-auto md:w-full">
       <h1 className="text-xl font-bold mt-28 flex items-center justify-center">
-        Pet List
+        {ChangeLanguage ? "Pet List" : "รายชิ่อสัตว์เลี้ยง"}
       </h1>
       <div className="min-w-80 mx-2 flex md:w-full justify-between py-4 items-center mt-8">
         <button
@@ -49,13 +49,13 @@ const App: React.FC = () => {
             router.push("/createpet");
           }}
         >
-          Create Pet
+          {ChangeLanguage ? "Create Pet" : "เพิ่มสัตว์เลี้ยง"}
         </button>
         <button
           className="btn btn-outline btn-secondary"
           onClick={toggleLanguage} // เรียกใช้ toggleLanguage จาก context
         >
-          Toggle Language {ChangeLanguage ? "EN" : "TH"}
+          {ChangeLanguage ? "EN" : "TH"}
         </button>
       </div>
       {/* table */}

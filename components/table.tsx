@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import CloseIcon from "@/public/assets/close-icon.svg";
 import axios from "axios";
 import ImagePetDefauit from "@/public/assets/petimage.svg";
+import { useLanguage } from "@/context/toggleLanguage";
 type Pet = {
   pet_id: number;
   pettype_id: number;
@@ -25,6 +26,7 @@ interface DataTableProps {
 
 const Table: React.FC<DataTableProps> = ({ data }) => {
   // console.log(data);
+  const { ChangeLanguage } = useLanguage();
   const [popUpEdit, setPopUpEdit] = useState<boolean>(false);
   const [popUpDelete, setPopUpDelete] = useState<boolean>(false);
   const [idDelete, setIdDelete] = useState<number>(0);
@@ -34,30 +36,35 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   const [petbreedEdit, setPetbreedEdit] = useState<string>("");
   const [petAboutEdit, setPetAboutEdit] = useState<string>("");
   const [petTypeEdit, setPetTypeEdit] = useState<number>(0);
-  const [petageEdit, setPetAgeEdit] = useState<number>(0);
+  const [petageEdit, setPetAgeEdit] = useState<number | null>(null);
+
   const [petsSxEdit, setPetsexEdit] = useState<string>("");
 
+  const [image, setImage] = useState<string>("");
   const [errorName, setErrorName] = useState<string>("");
+  const [errorNameEn, setErrorNameEn] = useState<string>("");
+  const [errorAge, setErrorAge] = useState<string>("");
+  const [errorAgeEn, setErrorAgeEn] = useState<string>("");
   const [errorType, setErrorType] = useState<string>("");
   const [errorSex, setErrorSex] = useState<string>("");
 
-  // console.log(petnameEdit);
-  // console.log(petbreedEdit);
+  console.log(image);
   // console.log(petageEdit);
   // console.log(petAboutEdit);
   // console.log(petTypeEdit);
-  console.log(petDataEdit);
 
   useEffect(() => {
     if (idDEdit !== 0) {
       getDatePetById();
     }
-  }, [idDelete, idDEdit]);
+  }, [idDelete, idDEdit, popUpEdit]);
 
   const getDatePetById = async () => {
     try {
       const res = await axios.get(`/api/pet/${idDEdit}`);
       const dataEdit = res.data.data;
+      console.log(dataEdit);
+
       setPetDataEdit(dataEdit);
       setPetnameEdit(dataEdit[0].pet_name);
       setPetbreedEdit(dataEdit[0].breed);
@@ -65,7 +72,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
       setPetAboutEdit(dataEdit[0].about);
       setPetTypeEdit(dataEdit[0].pettype_id);
       setPetsexEdit(dataEdit[0].pet_sex);
-
+      setImage(dataEdit[0]?.image_pet);
       setErrorName("");
       setErrorType("");
       setErrorSex("");
@@ -156,22 +163,91 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   };
 
   const handleEditPet = async () => {
+    let isValid = true;
+    if (petnameEdit === "") {
+      setErrorName("Please enter your pet name");
+      setErrorNameEn("กรุณาใส่ชื่อสัตว์เลี้ยง");
+      isValid = false;
+    }
+    if (petageEdit === 0) {
+      setErrorAge("Please enter your pet age");
+      setErrorAgeEn("กรุณากรอกข้อมูลอายุ");
+      isValid = false;
+    }
+    // if (formData.pettype_id === 0) {
+    //   setErrorType("Please select your pet type");
+    //   setErrorTypeEn("กรุณาเลือกข้อมูลประเภท");
+    //   isValid = false;
+    // }
+    // if (formData.pet_sex === "") {
+    //   setErrorSex("Please select your pet sex");
+    //   setErrorSexEn("กรุณาเลือกข้อมูลเพศ");
+
+    //   isValid = false;
+    // }
+    if (isValid) {
+      handleDeleteImage(image);
+      if (!petDataEdit[0].image_pet) {
+        alert("No image selected.");
+        return;
+      }
+      try {
+        const response = await fetch(petDataEdit[0].image_pet);
+        const blob = await response.blob();
+        const file = new File([blob], "pet_image.jpg", { type: blob.type });
+        const uploadFormData = new FormData();
+        uploadFormData.append("image", file);
+
+        const uploadResponse = await axios.post(
+          "/api/pet/uploadyoupet",
+          uploadFormData
+        );
+
+        // console.log(uploadResponse.data.urls[0]);
+        const data = {
+          pet_name: petnameEdit,
+          pettype_id: petTypeEdit,
+          breed: petbreedEdit,
+          pet_sex: petsSxEdit,
+          age: petageEdit,
+          about: petAboutEdit,
+          image_pet: uploadResponse.data.urls[0],
+        };
+        await axios.put(`/api/pet/${idDEdit}`, data);
+        setImage(uploadResponse.data.urls[0]);
+        window.location.reload();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+  // console.log(petDataEdit);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setPetDataEdit((prev) => [
+        {
+          ...prev[0],
+          image_pet: reader.result as string, // Update the image preview
+        },
+      ]);
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const handleDeleteImage = async (url: string) => {
+    console.log(url);
+
     try {
-      const data = {
-        pet_name: petnameEdit,
-        pettype_id: petTypeEdit,
-        breed: petbreedEdit,
-        pet_sex: petsSxEdit,
-        age: petageEdit,
-        about: petAboutEdit,
-      };
-
-      // console.log(data);
-
-      await axios.put(`/api/pet/${idDEdit}`, data);
-      window.location.reload();
-    } catch (error) {
-      console.log(error);
+      await axios.delete("/api/pet/deleteimagestore", { data: { url } });
+    } catch (err) {
+      console.log("Error deleting image:", err);
     }
   };
   const handleDelete = async () => {
@@ -190,16 +266,16 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
               <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Name
+                {ChangeLanguage ? "Name" : "ขื่อ"}
               </th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Breed
+                {ChangeLanguage ? "Breed" : "สายพันธ์"}
               </th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Created
+                {ChangeLanguage ? "Created" : "วันที่สร้าง"}
               </th>
               <th className="px-4 py-3 text-right font-medium text-gray-500">
-                Actions
+                {ChangeLanguage ? "edit/delete" : "แก้ไข/ลบ"}
               </th>
             </tr>
           </thead>
@@ -248,9 +324,12 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
         <div className="  fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center md:p-4  ">
           <div className="bg-white  shadow-xl w-full h-full md:h-auto md:w-[800px] md:rounded-3xl">
             <div className="flex justify-between items-center py-6 mx-4 md:mx-10">
-              <h2 className="text-2xl font-bold ">Pet Detail</h2>
+              <div className="text-xl text-black font-bold">
+                {ChangeLanguage ? "Pet Detail" : "รายละเอียดสัตว์เลี้ยง"}
+              </div>
+
               <Image
-                src={CloseIcon}
+                src={CloseIcon || "/placeholder.svg"}
                 alt="close button"
                 className="cursor-pointer"
                 onClick={() => setPopUpEdit(!popUpEdit)}
@@ -259,29 +338,59 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
             {/* Line เส้นกั้น */}
             <hr className="mb-10" />
             {/* image  */}
-            <div className="flex justify-center items-center">
-              <div className="w-32 h-32 rounded-full bg-base-200 ring ring-[#FF5C00] ring-offset-base-100 ring-offset-2 ">
-                {petDataEdit[0]?.image_pet ? (
-                  <img
-                    src={petDataEdit[0]?.image_pet || ImagePetDefauit} // ใช้ path ที่สัมพันธ์กับ public
-                    alt="Avatar"
-                    className="w-full h-full object-cover rounded-full"
-                    width={100} // กำหนดขนาดให้เหมาะสม
-                    height={100} // กำหนดขนาดให้เหมาะสม
-                  />
-                ) : (
-                  <div className="flex items-center justify-center w-full h-full">
-                    <div className="w-[80%] h-auto flex items-center justify-center">
-                      <Image
-                        src="/assets/petimage.svg" // ใช้ path ที่สัมพันธ์กับ public
-                        alt="petimage"
-                        width={100} // กำหนดขนาดให้เหมาะสม
-                        height={100} // กำหนดขนาดให้เหมาะสม
-                        className="object-cover"
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <div className="avatar">
+                  <div className="w-32 h-32 rounded-full bg-base-200 ring ring-[#FF5C00] ring-offset-base-100 ring-offset-2 ">
+                    {petDataEdit[0]?.image_pet ? (
+                      <img
+                        src={petDataEdit[0]?.image_pet || ImagePetDefauit} // ใช้ path ที่สัมพันธ์กับ public
+                        alt="Avatar"
+                        className="w-full h-full object-cover"
                       />
-                    </div>
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full">
+                        <div className="w-[80%] h-auto flex items-center justify-center">
+                          <Image
+                            src="/assets/petimage.svg" // ใช้ path ที่สัมพันธ์กับ public
+                            alt="petimage"
+                            width={100} // กำหนดขนาดให้เหมาะสม
+                            height={100} // กำหนดขนาดให้เหมาะสม
+                            className="object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+                <label
+                  htmlFor="avatar-upload"
+                  className="absolute bottom-0 right-0 cursor-pointer"
+                >
+                  <div className="w-8 h-8 rounded-full bg-[#FF5C00] flex items-center justify-center hover:bg-orange-500 transition-colors">
+                    <svg
+                      className="w-5 h-5 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    className="hidden"
+                    name="description"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                  />
+                </label>
               </div>
             </div>
             {/* Name and Age */}
@@ -311,16 +420,16 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
               </div>
               <div className="">
                 <div className="flex flex-col w-auto mx-5 gap-2">
-                  {errorName ? (
-                    <span className="text-red-500 font-bold">{errorName}</span>
+                  {errorAge ? (
+                    <span className="text-red-500 font-bold">{errorAge}</span>
                   ) : (
-                    <span className="text-[#FF5C00]">Pet Age</span>
+                    <span className="text-[#FF5C00]">Age</span>
                   )}
                   <input
                     type="number"
                     id="age"
                     name="age"
-                    value={petDataEdit[0]?.age || ""}
+                    value={petDataEdit[0]?.age || 0}
                     onChange={handleageEditChange}
                     placeholder="Enter your pet name"
                     required
@@ -346,7 +455,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                     type="text"
                     id="breed"
                     name="breed"
-                    value={petDataEdit[0]?.breed}
+                    value={petDataEdit[0]?.breed || ""}
                     onChange={handlebreedEditChange}
                     placeholder="Enter your pet name"
                     required
@@ -368,13 +477,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                   <select
                     id="pet_sex"
                     name="pet_sex"
-                    value={
-                      petDataEdit.length > 0 &&
-                      (petDataEdit[0].pet_sex === "M" ||
-                        petDataEdit[0].pet_sex === "F")
-                        ? petDataEdit[0].pet_sex
-                        : "M" // Fallback to "M" if pet_sex is invalid or empty
-                    }
+                    value={petDataEdit[0]?.pet_sex || "M"}
                     onChange={handlePeSexEditChange} // Update handler to use string values
                     required
                     disabled={petDataEdit.length === 0}
@@ -432,7 +535,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                 onClick={handleEditPet}
                 className="cursor-pointer bg-[#FF5C00] text-white px-3 rounded-lg py-2"
               >
-                Confime
+                Confime Edit
               </h1>
             </div>
           </div>
@@ -463,7 +566,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
                 onClick={handleDelete}
                 // onClick={}
               >
-                confirm
+                confirm Delete
               </button>
             </div>
           </div>

@@ -49,7 +49,7 @@ export default function Step3({
   const { ChangeLanguage, toggleLanguage } = useLanguage();
 
   const [image, setImage] = useState<string | null>(null);
-  console.log(image);
+  // console.log(image);
 
   const handleChangeCheckPage = (e: React.FormEvent) => {
     e.preventDefault();
