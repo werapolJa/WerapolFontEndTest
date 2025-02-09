@@ -5,12 +5,15 @@ import Step1 from "@/components/step1";
 import Step2 from "@/components/step2";
 import Step3 from "@/components/step3";
 import { useLanguage } from "@/context/toggleLanguage";
+import Image from "next/image";
+import CloseIcon from "@/public/assets/close-icon.svg";
 
 export default function CreatePet() {
   const [step, setStep] = useState(1);
   const { ChangeLanguage, toggleLanguage } = useLanguage();
+  const [imageCheckType, setImageCheckType] = useState<boolean>(true);
   // ดึงค่าจาก localStorage เมื่อเริ่มต้น (ถ้ามี)
-  console.log(ChangeLanguage);
+  console.log(imageCheckType);
 
   const [formData, setFormData] = useState(() => {
     if (typeof window !== "undefined") {
@@ -96,7 +99,15 @@ export default function CreatePet() {
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-
+    const validImageTypes = ["image/png", "image/jpeg", "image/jpg"];
+    if (!file) {
+      return;
+    }
+    if (!validImageTypes.includes(file.type)) {
+      setImageCheckType(false);
+      // alert("Please upload a valid image (PNG, JPG, JPEG).");
+      return; // ถ้าไม่ใช่ไฟล์รูปภาพ จะไม่ทำอะไรต่อ
+    }
     if (file) {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -170,9 +181,34 @@ export default function CreatePet() {
   return (
     <div className="bg-base-100 p-8 rounded-lg w-full mt-20">
       <h1 className="text-2xl font-bold mb-6 text-center">
-        Create Pet test Vercel
+        {ChangeLanguage ? "Create Pet" : "เพิ่มข้อมูลสัตว์เลี้ยง"}
       </h1>
       {renderStep()}
+      {!imageCheckType && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center md:p-4">
+          <div className="absolute bg-white bottom-0 shadow-xl w-full h-[80%] md:top-1/2 md:left-1/2 md:transform md:-translate-x-1/2 md:-translate-y-1/2 md:w-[500px] md:h-[300px] md:rounded-3xl">
+            <div className="flex justify-between items-center py-6 mx-4 md:mx-10">
+              <h2 className="text-2xl font-bold text-red-500">
+                {ChangeLanguage ? "warning" : "คำเตือน"}
+              </h2>
+              <Image
+                src={CloseIcon || "/placeholder.svg"}
+                alt="close button"
+                className="cursor-pointer"
+                onClick={() => setImageCheckType(!imageCheckType)}
+                width={20}
+                height={20}
+              />
+            </div>
+            {/* Line เส้นกั้น */}
+            <div className="flex justify-center items-center mt-20 text-xl">
+              {ChangeLanguage
+                ? "Please select a valid image file (JPG, PNG)."
+                : "ไฟล์รูปภาพที่ถูกต้อง (เช่น JPG, PNG)."}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

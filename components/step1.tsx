@@ -201,7 +201,7 @@ export default function Step1({
           {/* Navigation buttons */}
           <div className="flex justify-between mt-12">
             <button
-              className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] transition-colors"
+              className="px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] hover:bg-[#FFE8E0] transition-colors"
               onClick={() => router.push("/")}
             >
               Back
@@ -210,7 +210,7 @@ export default function Step1({
               className={`${
                 errorName
                   ? "px-6 py-2 rounded-full bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] "
+                  : "px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] hover:bg-[#FFE8E0] transition-colors"
               }`}
               onClick={handleChangePageCheck}
             >

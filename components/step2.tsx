@@ -56,6 +56,10 @@ export default function Step2({
       setErrorAge("Please enter your pet age");
       setErrorAgeEn("กรุณากรอกข้อมูลอายุ");
       isValid = false;
+    } else if (Number(formData.age) < 0) {
+      setErrorAge("Age must be greater than 1 year.");
+      setErrorAgeEn("อายุต้องมากกว่า 1 ปี");
+      isValid = false;
     }
     if (formData.breed === "") {
       setErrorBreed("Please enter your pet breed");
@@ -333,24 +337,40 @@ export default function Step2({
                 ) : (
                   <span className="text-[#FF5C00]">เพศ</span>
                 )}
-                <select
-                  id="pet_sex"
-                  name="pet_sex"
-                  value={formData.pet_sex || ""} // ให้ค่าของ select เป็น formData.pettype_id
-                  onChange={handleChange}
-                  required
-                  className={`${
-                    errorSexEn
-                      ? "input-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md cursor-pointer"
-                      : "input-bordered focus-within:outline-none focus-within:border-orange-500 border py-2 w-full px-2 rounded-md cursor-pointer"
-                  } ${formData.pet_sex === "" && "text-gray-400"}`}
-                >
-                  <option value="" disabled>
-                    เลือกเพศ
-                  </option>
-                  <option value="M">ผู้ชาย</option>
-                  <option value="F">ผู้หญิง</option>
-                </select>
+                <div className="flex gap-4 mt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="pet_sex"
+                      value="M"
+                      checked={formData.pet_sex === "M"}
+                      onChange={handleChange}
+                      required
+                      className={`cursor-pointer ${
+                        errorType
+                          ? "border-red-700"
+                          : "focus-within:border-orange-500"
+                      }`}
+                    />
+                    ชาย
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="pet_sex"
+                      value="F"
+                      checked={formData.pet_sex === "F"}
+                      onChange={handleChange}
+                      required
+                      className={`cursor-pointer ${
+                        errorType
+                          ? "border-red-700"
+                          : "focus-within:border-orange-500"
+                      }`}
+                    />
+                    หญิง
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -368,7 +388,7 @@ export default function Step2({
               className={`${
                 errorAge || errorBreed || errorSex || errorType
                   ? "px-6 py-2 rounded-full bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] "
+                  : "px-6 py-2 rounded-full bg-[#FFF5F2] text-[#FF5C00] hover:bg-[#FFE8E0] transition-colors"
               }`}
               onClick={handleChangeCheckPage}
             >
