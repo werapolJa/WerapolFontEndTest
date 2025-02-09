@@ -20,15 +20,15 @@ npm run dev
 Live Demo https://werapol-font-end-test.vercel.app/
 
 
-Exam 
-### NextJs 14 & TypeScript
-### CRUD API
-### FileUpload Short-text long-text numeric dropdown radio and Vaildate
-### สามารถกดบันทึกแบบฟอร์มล่าสุดไวได้ เวลาเปลี่ยนหน้าแล้วกลับมาข้อมูลยังอยู่
-### ข้อมูลที่บันทึกไว้ หลังจากปิดเว็บและเปิดใหม่ ข้อมูลยังอยู่
-### เปลี่ยนภาษา
-### Responsive Web
-### บันทึกข้อมูลด้วยภาษา sql
+### Exam 
+1 NextJs 14 & TypeScript
+2 CRUD API
+3 FileUpload Short-text long-text numeric dropdown radio and Vaildate
+4 สามารถกดบันทึกแบบฟอร์มล่าสุดไวได้ เวลาเปลี่ยนหน้าแล้วกลับมาข้อมูลยังอยู่
+5 ข้อมูลที่บันทึกไว้ หลังจากปิดเว็บและเปิดใหม่ ข้อมูลยังอยู่
+6 เปลี่ยนภาษา
+7 Responsive Web
+8 บันทึกข้อมูลด้วยภาษา sql
 
 
 
