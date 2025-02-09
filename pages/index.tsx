@@ -1,115 +1,97 @@
-import Image from "next/image";
-import localFont from "next/font/local";
+"use client";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import React, { useEffect, useState } from "react";
+import Table from "@/components/table"; // Import Table
+import Pagination from "@/components/renderPaginationButtons"; // Import Pagination
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useLanguage } from "@/context/toggleLanguage"; // Import context
 
-export default function Home() {
+// Define the Pet interface
+type Pet = {
+  pet_id: number;
+  pettype_id: number;
+  image: string;
+  pet_name: string;
+  experience: "0-2" | "3-5" | "5+";
+  breed: string;
+  pet_sex: "M" | "F";
+  age: number;
+  color: string;
+  weight: number;
+  about?: string;
+  create_at: string;
+  update_at: string;
+  image_pet: string;
+  disease: boolean | undefined;
+};
+
+const App: React.FC = () => {
+  const router = useRouter();
+  const { ChangeLanguage, toggleLanguage } = useLanguage(); // Use context from LanguageContext
+  const [pet, setPet] = useState<Pet[]>([]); // Use Pet[] type instead of any[]
+
+  const rowsPerPage = 8;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const totalPages = Math.ceil(pet.length / rowsPerPage);
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentData = pet.slice(indexOfFirstRow, indexOfLastRow);
+
+  useEffect(() => {
+    DataPet();
+  }, []);
+
+  const DataPet = async () => {
+    try {
+      const res = await axios.get("/api/pet");
+      setPet(res.data); // Ensure the response data matches the Pet type
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              pages/index.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    <div className="min-w-80 mx-2 lg:max-w-6xl lg:mx-auto md:w-full">
+      <h1 className="text-xl font-bold mt-28 flex items-center justify-center">
+        {ChangeLanguage ? "Pet List" : "รายชิ่อสัตว์เลี้ยง"}
+      </h1>
+      <div className="min-w-80 mx-2 flex md:w-full justify-between py-4 items-center mt-8">
+        <button
+          className="btn btn-outline btn-info"
+          onClick={() => {
+            router.push("/createpet");
+          }}
+        >
+          {ChangeLanguage ? "Create Pet" : "เพิ่มสัตว์เลี้ยง"}
+        </button>
+        <button
+          className="btn btn-outline btn-secondary"
+          onClick={toggleLanguage} // Call toggleLanguage from context
+        >
+          {ChangeLanguage ? "EN" : "TH"}
+        </button>
+      </div>
+      {/* Table */}
+      <Table data={currentData} />
+      {/* Pagination */}
+      {currentData.length !== 0 && (
+        <div className="flex mt-10">
+          <div className="flex-1 w-full md:mr-20 items-center">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
     </div>
   );
-}
+};
+
+export default App;
