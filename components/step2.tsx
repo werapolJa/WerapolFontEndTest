@@ -219,24 +219,40 @@ export default function Step2({
                 ) : (
                   <span className="text-[#FF5C00]">Sex</span>
                 )}
-                <select
-                  id="pet_sex"
-                  name="pet_sex"
-                  value={formData.pet_sex || ""} // ให้ค่าของ select เป็น formData.pettype_id
-                  onChange={handleChange}
-                  required
-                  className={`${
-                    errorType
-                      ? "input-bordered focus-within:outline-none border-red-700 focus-within:border-orange-500 border px-2 py-2 w-full rounded-md cursor-pointer"
-                      : "input-bordered focus-within:outline-none focus-within:border-orange-500 border py-2 w-full px-2 rounded-md cursor-pointer"
-                  } ${formData.pet_sex === "" && "text-gray-400"}`}
-                >
-                  <option value="" disabled>
-                    Select Type
-                  </option>
-                  <option value="M">Male</option>
-                  <option value="F">Female</option>
-                </select>
+                <div className="flex gap-4 mt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="pet_sex"
+                      value="M"
+                      checked={formData.pet_sex === "M"}
+                      onChange={handleChange}
+                      required
+                      className={`cursor-pointer ${
+                        errorType
+                          ? "border-red-700"
+                          : "focus-within:border-orange-500"
+                      }`}
+                    />
+                    Male
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="pet_sex"
+                      value="F"
+                      checked={formData.pet_sex === "F"}
+                      onChange={handleChange}
+                      required
+                      className={`cursor-pointer ${
+                        errorType
+                          ? "border-red-700"
+                          : "focus-within:border-orange-500"
+                      }`}
+                    />
+                    Female
+                  </label>
+                </div>
               </div>
             </div>
           </div>

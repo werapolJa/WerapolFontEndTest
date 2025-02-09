@@ -99,7 +99,7 @@ export default function Step3({
 
       // console.log(dataCreate);
       console.log(dataCreate);
-      
+
       await axios.post(`/api/pet`, dataCreate);
       resetFormData({} as React.ChangeEvent<HTMLInputElement>);
       router.push("/");

@@ -47,6 +47,7 @@ export default async function handler(
       weight,
       image_pet,
       about,
+      disease,
     } = req.body;
     console.log(req.body);
     // ตรวจสอบว่ามีข้อมูล
@@ -65,8 +66,8 @@ export default async function handler(
     try {
       // สร้างตัวแปล เก็บ query เพื่อนำไปใช้
       const petInsertQuery = `
-      insert into pet (pet_name, pettype_id, breed, pet_sex, age, color, weight, image_pet,about)
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+      insert into pet (pet_name, pettype_id, breed, pet_sex, age, color, weight, image_pet,about,disease)
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9,$10);
     `;
 
       const petResult = await client.query(petInsertQuery, [
@@ -79,6 +80,7 @@ export default async function handler(
         weight,
         image_pet,
         about,
+        disease
       ]);
 
       // ถ้าไม่สามารถเพิ่มข้อมูลได้ (ไม่มีผลลัพธ์)
