@@ -66,7 +66,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
   }, [idDEdit]);
 
   useEffect(() => {
-    if (petnameEdit !== "") {
+    if (petnameEdit !== "" && petnameEdit.length < 20) {
       setErrorName("");
       setErrorNameEn("");
     }
@@ -74,7 +74,8 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
       setErrorAge("");
       setErrorAgeEn("");
     }
-    if (petbreedEdit !== "") {
+
+    if (petbreedEdit !== "" && petbreedEdit.length < 20) {
       setErrorBreed("");
       setErrorBreedEn("");
     }
@@ -183,6 +184,7 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
       return updatedData;
     });
   };
+  console.log(petnameEdit.length);
 
   const handleEditPet = async () => {
     let isValid = true;
@@ -190,9 +192,10 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
       setErrorName("Please enter your pet name");
       setErrorNameEn("กรุณาใส่ชื่อสัตว์เลี้ยง");
       isValid = false;
-    } else {
-      setErrorName("");
-      setErrorNameEn("");
+    } else if (petnameEdit.length > 21) {
+      setErrorName("Name should not exceed 20 words.");
+      setErrorNameEn("ชื่อไม่ควรเกิน 20 คำ");
+      isValid = false;
     }
     if (petageEdit === 0) {
       setErrorAge("Please enter your pet age");
@@ -202,25 +205,24 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
       setErrorAge("Age must be greater than 1 year.");
       setErrorAgeEn("อายุต้องมีค่ามากกว่า 1 ปี");
       isValid = false;
-    } else {
-      setErrorAge("");
-      setErrorAgeEn("");
+    } else if (petageEdit > 999) {
+      setErrorAge("Years should be three digits max.");
+      setErrorAgeEn("ตัวเลขอายุไม่ควรเกิน 3 หลัก");
+      isValid = false;
     }
     if (petbreedEdit === "") {
       setErrorBreed("Please enter your pet breed");
       setErrorBreedEn("กรุณากรอกข้อมูลสายพันธ์");
       isValid = false;
-    } else {
-      setErrorBreed("");
-      setErrorBreedEn("");
+    } else if (petbreedEdit.length > 21) {
+      setErrorBreed("Text should not exceed 20 words.");
+      setErrorBreedEn("ตัวอักษรไม่ควรเกิน 20 คำ");
+      isValid = false;
     }
     if (petAboutEdit === "") {
       setErrorAbout("Please enter your pet about");
       setErrorAboutEn("กรุณาระบุสัตว์เลี้ยงของคุณเกี่ยวกับ");
       isValid = false;
-    } else {
-      setErrorAbout("");
-      setErrorAboutEn("");
     }
     if (isValid) {
       handleDeleteImage(image);
@@ -311,7 +313,6 @@ const Table: React.FC<DataTableProps> = ({ data }) => {
     console.log(imageDelete);
 
     try {
-    
       await axios.delete("/api/deletetableimage", {
         data: { url: imageDelete },
       });
