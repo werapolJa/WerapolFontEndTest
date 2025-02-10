@@ -17,6 +17,8 @@ npm install
 ### 4. รันโปรเจค
 npm run dev
 
+##Live Demo 
+https://werapol-font-end-test.vercel.app/
 
 ## Exam
 - Next.js 14 & TypeScript
