@@ -60,10 +60,18 @@ export default function Step2({
       setErrorAge("Age must be greater than 1 year.");
       setErrorAgeEn("อายุต้องมากกว่า 1 ปี");
       isValid = false;
+    } else if (Number(formData.age.length) > 3) {
+      setErrorAge("Years should be three digits max.");
+      setErrorAgeEn("ตัวเลขอายุไม่ควรเกิน 3 หลัก");
+      isValid = false;
     }
     if (formData.breed === "") {
       setErrorBreed("Please enter your pet breed");
       setErrorBreedEn("กรุณากรอกข้อมูลสายพันธ์");
+      isValid = false;
+    } else if (formData.breed.length >= 20) {
+      setErrorBreed("Text should not exceed 20 words.");
+      setErrorBreedEn("ตัวอักษรไม่ควรเกิน 20 คำ");
       isValid = false;
     }
     if (formData.pettype_id === 0) {

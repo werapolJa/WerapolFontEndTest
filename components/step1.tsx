@@ -28,7 +28,7 @@ export default function Step1({
   const [errorNameEn, setErrorNameEn] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false); // เพิ่ม useState เพื่อให้แน่ใจว่าเราไม่เจอ hydration error
   const { ChangeLanguage, toggleLanguage } = useLanguage();
-
+  console.log(formData.pet_name.length);
   useEffect(() => {
     setIsMounted(true); // ตั้งค่าสถานะให้เป็น true เมื่อ component ถูก mount
   }, []);
@@ -44,6 +44,10 @@ export default function Step1({
     if (formData.pet_name === "") {
       setErrorName("Please enter your pet name");
       setErrorNameEn("กรุณาใส่ชื่อสัตว์เลี้ยง");
+      return;
+    } else if (formData.pet_name.length > 21) {
+      setErrorName("Name should not exceed 20 words.")
+      setErrorNameEn("ชื่อไม่ควรเกิน 20 คำ");
       return;
     }
     nextStep();
